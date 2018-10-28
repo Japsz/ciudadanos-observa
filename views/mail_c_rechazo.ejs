@@ -1,0 +1,22 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Observa</title>
+</head>
+
+<body>
+<h1>Hola <%= comm.nombre%>!</h1>
+<p>Te enviamos este mail pues uno de los comentarios que hiciste fue eliminado por el siguiente motivo</p>
+<h3><%= razon%></h3>
+<%
+var f_gen = new Date(comm.fecha);
+f_gen = f_gen.toLocaleString();%>
+<p>Comentario hecho el: <%= f_gen%></p>
+<p> Comentario : <%= comm.texto%></p>
+<p> Esperamos tus siguientes comentarios sigan las reglas de nuestro portal.</p>
+
+</body>
+</html>

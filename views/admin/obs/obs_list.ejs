@@ -1,0 +1,93 @@
+<%- include ../../layouts/admin_header.ejs %>
+<h2 class="page-header">Observatorios de: <%= inst.nom%><a class="btn btn-info pull-right nobs"  data-toggle="modal" data-target="#obs" data-idinst="<%= inst.idinstitucion%>" > + <span class="glyphicon glyphicon-eye-open"  aria-hidden="true"></span></a> </h2>
+<div class="row placeholders">
+    <%
+    if(data.length){
+        var status;
+    for(var i = 0;i < data.length; i++){
+        switch(data[i].estado) {
+            case 1:
+                status = "Inactivo";
+                break;
+            case 2:
+                status = "Activo";
+                break;
+            case 3:
+                status = "Archivado";
+                break;
+            default:
+                status = "inactivo";
+        }
+    %>
+    <div class="col-sm-3 col-xs-6 placeholder">
+        <img src="<%= data[i].avatar_pat %>" width="150px" height="150px">
+        <h3><%= data[i].nom%></h3>
+        <h5>Máx: <%= data[i].max%></h5>
+        <h5>Estado: <%= status%></h5>
+        <h6>Monitor: <%= data[i].correo%></h6>
+        <a class="btn btn-info" href="/show_obs/<%= data[i].idobservatorio%>">Ver</a>
+    </div>
+    <%
+    }
+    } else{%>
+    <div class="col-sm-6 col-xs-12">
+        <p>No hay Observatorios</p>
+    </div>
+    <%
+    }
+    %>
+</div>
+<div class="modal fade" id="obs" tabindex="-1" role="dialog" >
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Crear Observatorio</h4>
+            </div>
+            <form action="/obs/add" method="POST">
+                <div class="modal-body">
+                    <label>Nombre</label>
+                    <input type="text" name="nom" class="form-control" required>
+                    <label>Máximo de Integrantes</label>
+                    <input type="text" name="maxim" class="form-control" required>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group">
+
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                        <button type="submit" id="continue" name="id" value="" class="btn btn-primary">Modificar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        var data;
+        $(document).on("click", ".nobs", function() {
+            var instid = $(this).data('idinst');
+            $(".modal-footer #continue").val(instid);
+        });
+        $("#mailkeyup").keyup( function() {
+            data = { corr : $(this).val(),obs: $(this).data("obs")};
+            $("#continue").attr("disabled", true);
+            if(data.corr.length >= 2){
+                $.ajax({
+                    type: 'POST',
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
+                    url: '/monit_stream',
+                    success: function(data) {
+                        $("#monids").html(data);
+                        console.log(data);
+                    }
+                });
+            }
+        });
+    });
+    function habilit(){
+        $("#continue").attr("disabled", false);
+    };
+</script>
+<%- include ../../layouts/footer.ejs %>

@@ -1,0 +1,119 @@
+<%- include ../layouts/user_header %>
+
+<div class="container blog-content">
+    <div class="row">
+
+        <div class="col-sm-8 blog-main">
+            <div class="row">
+                <div class="col-sm-12" id="psts">
+<% if(data.length) {
+    var f_gen,estado;
+    for(var i = 0;i<data.length;i++){
+        f_gen = new Date(data[i].fecha);
+        f_gen = f_gen.toLocaleString();
+        switch(data[i].estado){
+            case 1:
+                estado = "<a class='btn btn-warning'>Aprobación Pendiente</a>";
+                break;
+            case 2:
+                estado = "<a class='btn btn-success'>Aprobado</a>";
+                break;
+            case 3:
+                estado = "<a class='btn btn-danger'>Rechazado</a><a class='btn btn-warning edit' data-toggle='modal' data-target='#aa' data-tipo='" + data[i].tipo
+                        + "' data-tit='" + data[i].t_principal + "' data-cont='" + data[i].contenido + "' data-tags='" + data[i].tags + "' data-idpost = '" + data[i].idpost + "'><i class='glyphicon glyphicon-wrench'></i> Reeditar</a>";
+                break;
+        }%><section class="blog-post" id="<%= data[i].idpost %>">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <% if(data[i].tipo == 3){%>
+                                <img src="<%= data[i].t_principal%>" style="margin: auto;display: block;" width="auto" class="img-responsive">
+                                <%} else if(data[i].tipo == 4){%>
+                                <%- data[i].t_principal%>
+                                <%}%>
+                                <div class="blog-post-meta">
+                                    <input class="hidden" value="<%= data[i].tagz%>" data-id="<%= data[i].idpost%>">
+                                    <p class="blog-post-date pull-right"><%= f_gen%></p>
+                                </div>
+                                <div class="blog-post-content">
+                                    <%
+                                    switch(data[i].tipo) {
+                                    case 1:
+                                    %>
+                                    <a href="/post/<%= data[i].idpost%>">
+                                        <h2 class="blog-post-title"><%= data[i].t_principal%></h2>
+                                    </a><%
+                                        break;
+                                    case 2:%>
+                                    <a href="/post/<%= data[i].idpost%>">
+                                        <h2 class="blog-post-title"><%= data[i].t_principal%></h2>
+                                    </a>
+                                    <p><%- data[i].contenido%></p>
+                                    <%
+                                        break;
+                                    default:%>
+                                    <p><%- data[i].contenido%></p>
+                                    <%  break;
+                                    }%>
+                                    <div class="blog-post-share pull-left" style="display: flex">
+                                        <img src="<%= data[i].iconouser%>" style="margin: 0;height: 30px" width="30px" class="img-circle img-responsive">
+                                        <h5 style="margin-left: 10px"><%= data[i].username%></h5>
+                                    </div>
+                                    <div class="blog-post-share pull-right">
+                                        <%- estado%>
+                                        <a onclick="preliminar(<%= data[i].idpost%>)" class="btn btn-danger"><i class="fa fa-remove"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section><%
+                    }%>
+                    <%if(data.length == 6){%>
+                    <input type="hidden" value="<% if(data.length){%><%= data[data.length-1].fecha%><%}%>" data-strim="<%= pat%>" data-helper="<%= helper%>" id="idpst">
+                    <%}%>
+                    <script type="text/javascript">
+                        var loading = false;
+                        var fin = <% if(data.length < 6){%>true<%} else {%>false<%}%>;
+                        $(window).scroll(function() {
+                            console.log(loading);
+                            if($(window).scrollTop() + $(window).height() > $(document).height() - 100 && !loading && !fin)  {
+                                loading = true;
+                                $("#loader").removeClass("hidden");
+                                var data = {};
+                                data.idpost = $("#idpst").val();
+                                data.strim = $("#idpst").data("strim");
+                                data.helper = $("#idpst").data("helper");
+                                $.ajax({
+                                    type: 'POST',
+                                    data: JSON.stringify(data),
+                                    contentType: 'application/json',
+                                    url: '/post_stream',
+                                    success: function(data) {
+                                        $("#psts").append(data.html);
+                                        $("#loader").addClass("hidden");
+
+                                        loading = false;
+                                        if(data.newval != "nada"){
+                                            $("#idpst").val(data.newval);
+                                        } else {
+                                            fin = true;
+                                            $("#next").html("");
+                                        }
+                                    }
+                                });
+
+                            }
+                        });
+                    </script>
+                    <% } else {%>
+<p> No hay posts</p>
+<% }%>
+
+                </div>
+            </div>
+            <% if(data.length == 6){%>
+            <div class="strimload" id="loader" style="margin-left: 50%;margin-bottom: 20px"></div>
+            <%}%>
+
+        </div><!-- /.blog-main -->
+
+<%- include ../layouts/cdd_footer.ejs %>

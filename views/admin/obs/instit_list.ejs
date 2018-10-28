@@ -1,0 +1,320 @@
+<%- include ../../layouts/admin_header.ejs %>
+    <h2 class="page-header">Instituciones <a class="btn btn-info pull-right" data-toggle="modal" href="#newinst"> + <span class="glyphicon glyphicon-education"  aria-hidden="true"></span> Nuevo</a> </h2>
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        <%
+        if(data.length){
+            for(var i = 0;i < data.length; i++){
+        %>
+            <div class="panel panel-primary">
+                <!-- Título Institución -->
+                <div class="panel-heading" role="tab" id="heading<%= data[i].idinstitucion%>">
+                    <h2 class="panel-title">
+                        <a role="button" data-toggle="collapse" class="btn" data-parent="#accordion" href="#collapse<%= data[i].idinstitucion%>" aria-expanded="true" aria-controls="collapse<%= data[i].idinstitucion%>">
+                            <%= data[i].nom%>
+                        </a>
+                        <div class="btn-group pull-right">
+                            <a  class="btn btn-success nobs"  data-toggle="modal" data-target="#obs_add" data-idinst="<%= data[i].idinstitucion%>"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Agregar Observatorio</a>
+                            <a  class="btn btn-warning nmonit"  data-toggle="modal" data-target="#inst_edit" data-nom="<%= data[i].nom%>" data-direccion="<%= data[i].direccion%>" data-comuna="<%= data[i].comuna%>" data-fono="<%= data[i].fono%>" data-corr="<%= data[i].correo%>" data-idinst="<%= data[i].idinstitucion%>"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Editar</a>
+                        </div>
+                    </h2>
+                </div>
+                <!-- Observatorios de la Institución -->
+                <div class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading<%= data[i].idinstitucion%>" id="collapse<%= data[i].idinstitucion%>">
+                        <% var list,auxlist,status;
+                        if(data[i].obs_token){
+                            list = data[i].obs_token.split(",");
+                        %>
+                        <table class="table table-responsive">
+                            <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Máximo</th>
+                                <th>Estado</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <% for(var j = 0;j < list.length;j++){
+                                auxlist = list[j].split("@@");
+                                // switch Estado del observatorio
+                                switch(parseInt(auxlist[3])){
+                                    case 2:
+                                        status = "Inactivo";
+                                        break;
+                                    case 1:
+                                        status = "Activo";
+                                        break;
+                                    case 3:
+                                        status = "Archivado";
+                                        break;
+                                    default:
+                                        status = "inactivo";
+                                }%>
+                            <tr>
+                                <td><%= auxlist[1]%></td>
+                                <td><%= auxlist[2]%></td>
+                                <td><%= status%></td>
+                                <% if(auxlist[3] == 3){%>
+                                <td><a class="btn btn-info pull-right" href="/show_obs/<%= auxlist[0]%>">Ver</a></td>
+                                <%} else {%>
+                                <td>
+                                    <div class="btn-group pull-right">
+                                        <a class="btn btn-info" href="/show_obs/<%= auxlist[0]%>">Ver</a>
+                                        <a class="btn btn-primary" onclick="set_modal(this)" data-toggle="modal" data-idobs="<%= auxlist[0]%>" href="#obs_monits">Monitores</a>
+                                        <a class="btn btn-warning" href="/obs_archive/<%= auxlist[0]%>">Archivar</a>
+                                    </div>
+                                </td>
+                                <%}%>
+                            </tr>
+                            <%}%>
+                            </tbody>
+                        </table>
+                        <%
+                        } else {%>
+                        <div class="panel-body">
+                            <p class="text-center" style="margin:5px">No hay Observatorios</p>
+                        </div>
+                        <%}%>
+                </div>
+            </div>
+        <%
+        }
+        } else{%>
+        <div class="col-sm-6 col-xs-12">
+            <a>No hay Instituciones</a>
+        </div>
+        <%
+        }
+        %>
+    </div>
+<!-- Modal Editar Institución -->
+<div class="modal fade" id="inst_edit" tabindex="-1" role="dialog" >
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Editar Institución</h4>
+            </div>
+            <form action="/instit_edit" method="POST">
+                <div class="modal-body">
+                    <label for="nom">Nombre Institución</label>
+                    <input type="text" class="form-control" name="nom" id="nom" required>
+                    <label for="nom">Correo Contacto</label>
+                    <input type="text" class="form-control" name="correo" id="corr" required>
+                    <label for="nom">Teléfono de contacto</label>
+                    <input type="text" class="form-control" name="fono" id="fono"required>
+                    <label>Comuna</label>
+                    <input type="text" name="comuna" id="comuna" class="form-control" >
+                    <label>Direccion</label>
+                    <input type="text" name="direccion" id="direccion" class="form-control" >
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                        <button type="submit" id="continue" name="id" value="" class="btn btn-primary">Modificar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal Crear Institución-->
+<div class="modal fade" id="newinst" tabindex="-1" role="dialog" >
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Crear Institución</h4>
+            </div>
+            <form action="/inst/add" method="POST">
+                <div class="modal-body">
+                    <label for="nom">Nombre Institución</label>
+                    <input type="text" class="form-control" name="nom" required>
+                    <label for="nom">Correo Contacto</label>
+                    <input type="text" class="form-control" name="correo" required>
+                    <label for="nom">Teléfono de contacto</label>
+                    <input type="text" class="form-control" name="fono" required>
+                    <label>Comuna</label>
+                    <input type="text" name="comuna" class="form-control" >
+                    <label>Direccion</label>
+                    <input type="text" name="direccion" class="form-control" >
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Crear</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal Agregar observatorio -->
+<div class="modal fade" id="obs_add" tabindex="-1" role="dialog" >
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Crear Observatorio</h4>
+            </div>
+            <form action="/obs/add" method="POST">
+                <div class="modal-body">
+                    <label>Nombre</label>
+                    <input type="text" name="nom" class="form-control" required>
+                    <label>Máximo de Integrantes</label>
+                    <input type="text" name="maxim" class="form-control" required>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                        <button type="submit" id="continue" name="id" value="" class="btn btn-primary">Crear</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal Monitores de Observatorio-->
+<div class="modal fade" id="obs_monits" tabindex="-1" role="dialog" >
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Administrar Monitores</h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="col-md-12">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Monitores actuales</h3>
+                        </div>
+                        <table class="table table-responsive">
+                            <thead>
+                            <tr>
+                                <th>Correo</th>
+                                <th>Username</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody id="actuales">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Buscar Monitores</h3>
+                        </div>
+                        <div class="panel-body">
+                            <label>Nombre</label>
+                            <input type="text" id="mailkeyup" class="form-control" required>
+                        </div>
+                        <table class="table table-responsive">
+                            <thead>
+                            <tr>
+                                <th>Correo</th>
+                                <th>Username</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody id="busqueda">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" id="obs_act" value="">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        // Logica editar institucion
+        $(document).on("click", ".nmonit", function() {
+            var instid = $(this).data('idinst');
+            var corr = $(this).data('corr');
+            var nom = $(this).data('nom');
+            var fono = $(this).data('fono');
+            var comuna = $(this).data('comuna');
+            var direccion = $(this).data('direccion');
+            $(".modal-footer #continue").val(instid);
+            $(".modal-body #corr").val(corr);
+            $(".modal-body #fono").val(fono);
+            $(".modal-body #nom").val(nom);
+            $(".modal-body #comuna").val(comuna);
+            $(".modal-body #direccion").val(direccion);
+        });
+    });
+    // Lógica agregar observatorio
+    $(document).on("click", ".nobs", function() {
+        var instid = $(this).data('idinst');
+        $(".modal-footer #continue").val(instid);
+    });
+    // Lógica buscador de monitores
+    $("#mailkeyup").keyup( function() {
+        if ($(this).val().length >= 2) {
+            buscar_monit( $("#obs_act").val(),$(this).val());
+        }
+    });
+
+    function buscar_monit(idobs,corr){
+        data = { corr : corr,idobs: idobs};
+        $.ajax({
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            url: '/monit_stream',
+            success: function(data) {
+                $("#busqueda").html(data);
+            }
+        });
+
+    }
+    function manage_monits(iduser,accion) {
+        data = {idobservatorio: $("#obs_act").val(),idmonitor: iduser};
+        $.ajax({
+            type: 'POST',
+            data: data,
+            url: '/obsmonit_' + accion,
+            success: function (data) {
+                if(!data.error){
+                    buscar_monit( $("#obs_act").val(),$("#mailkeyup").val());
+                    cargar_monit($("#obs_act").val());
+                } else if(!data){
+                    alert("Hubo un error con el servidor");
+                } else {
+                    alert(data.str);
+                }
+            }
+        });
+    }
+    function cargar_monit(idobs){
+        data = { idobs: idobs};
+
+        $.ajax({
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            url: '/obsmonit_stream',
+            success: function(data) {
+                $("#actuales").html(data);
+            }
+        });
+    }
+    function set_modal(yo){
+        $("#obs_act").val($(yo).data().idobs);
+        cargar_monit($(yo).data().idobs);
+        console.log("aló");
+    };
+    function habilit(){
+        $("#continue").attr("disabled", false);
+    };
+</script>
+<%- include ../../layouts/footer.ejs %>

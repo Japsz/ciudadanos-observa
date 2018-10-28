@@ -1,0 +1,450 @@
+<div class="col-sm-4 blog-sidebar">
+
+    <div class="sidebar-module">
+        <form action="/tags/bsq" method="POST">
+            <div class="form-group">
+                <input type="text" name="busqueda" class="form-control" placeholder="Buscar por tags">
+            </div>
+        </form>
+    </div><!-- /.sidebar-module -->
+
+    <div class="sidebar-module">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4>Categorías</h4>
+                <div class="categories">
+                    <a class="label label-light label-primary margen" href="/tagbsq/71">Agua limpia y saneamiento</a>
+                    <a class="label label-light label-primary margen" href="/tagbsq/18">Fin de la pobreza</a>
+                    <a class="label label-light label-primary margen" href="/tagbsq/76">Ciudades sostenibles</a>
+                    <a class="label label-light label-danger margen" href="/tagbsq/69">Educación de Calidad</a>
+                    <a class="label label-light label-success margen" href="/tagbsq/70">Igualdad de Género</a>
+                    <a class="label label-light label-info margen" href="/tagbsq/78">Acción por el clima</a>
+                    <a class="label label-light label-info margen" href="/tagbsq/73">Trabajo decente</a>
+                    <a class="label label-light label-info margen" href="/tagbsq/68">Salud y Bienestar</a>
+                    <a class="label label-light label-danger margen" href="/tagbsq/79">Vida Submarina</a>
+                    <a class="label label-light label-warning margen" href="/tagbsq/67">Hambre Cero</a>
+                    <a class="label label-light label-primary margen" href="/tagbsq/81">Paz justicia e Instituciones solidas</a>
+                    <a class="label label-light label-warning margen" href="/tagbsq/77">Producción y consumo responsable</a>
+                    <a class="label label-light label-success margen" href="/tagbsq/75">Reducción de desigualdades</a>
+                    <a class="label label-light label-danger margen" href="/tagbsq/74">Ind. Innovación e infraestructura</a>
+                    <a class="label label-light label-success margen" href="/tagbsq/80">Vida de ecosistemas terrestres</a>
+                    <a class="label label-light label-warning margen" href="/tagbsq/82">Alianzas para lograr objetivos</a>
+                    <a class="label label-light label-warning margen" href="/tagbsq/72">Energía Limpia y asequible</a>
+                </div>
+            </div>
+        </div>
+    </div><!-- /.sidebar-module -->
+    <div class="sidebar-module">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4>Archivos</h4>
+                <form action="/b_fecha" method="POST">
+                    <label>Desde:</label>
+                    <input type="date" name="desde" class="form-control">
+                    <label>Hasta:</label>
+                    <input type="date" name="hasta" class="form-control">
+                    <button type="submit" class="btn btn-success">Buscar</button>
+                </form>
+
+            </div>
+        </div>
+    </div><!-- /.sidebar-module -->
+
+    <div class="sidebar-module">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4>Redes Sociales</h4>
+                <ol class="list-unstyled">
+                    <li><a href="https://www.facebook.com/observaciudadania">Facebook</a></li>
+                    <li><a href="https://www.instagram.com/observaciudadania">Instagram</a></li>
+                    <li><a href="https://www.linkedin.com/company/observaciudadania/">Linked In</a></li>
+                    <li><a href="https://www.youtube.com/channel/UCRk_2lqkIE8WENW1hRLzZNA">Youtube</a></li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.sidebar-module -->
+
+</div><!-- /.blog-sidebar -->
+</div><!-- /.row -->
+
+</div><!-- /.container -->
+
+
+
+
+<%- include footer_x.ejs %>
+
+<button class="material-scrolltop primary" type="button"></button>
+<!-- Modals -->
+<div class="modal fade" id="aa" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h2 class="modal-title" id="myModalLabel">Crear Post</h2>
+            </div>
+            <form id="mform">
+                <div class="modal-body">
+                    <div id="preview"></div>
+                    <div class="form-group">
+                        <%  if(usr.tipo == 1){ %>
+                                <select name="idobserva" class="form-control">
+                                    <option value="" disabled selected>Seleccione un observatorio</option>
+                        <%
+                                    for(var j = 0; j<obs.length;j++){
+                            %>
+                                    <option value="<%= obs[j].idobservatorio%>"><%= obs[j].nom%></option>
+                        <%
+
+                                    }%>
+                                    <option value="no">Sin observatorio</option>
+                                </select>
+                        <%
+                            } else if(usr.tipo == 3){%>
+                                <input name="idobserva" type="hidden" value="<%= obs[0].idobservatorio%>">
+                        <%}%>
+
+                        <input type="text" name="tit" id="t_princ" class="form-control" placeholder="" required>
+                        <div class="input-group hidden" id="fail">
+                            <input type="file" name="filetoupload" onchange="upload(this)">
+                            <a class="input-group-btn btn btn-success">Sube una foto <i class="glyphicon glyphicon-upload"></i></a>
+                        </div>
+                        <select id="catego" class="form-control hidden" name="cat">
+                            <option value="" disabled selected>Selecciona una categoría </option>
+                            <option value="18">Fin de la Pobreza</option>
+                            <option value="78">Acción por el Clima</option>
+                            <option value="71">Agua limpia y saneamiento</option>
+                            <option value="82">Alianzas para lograr Objetivos</option>
+                            <option value="76">Ciudades y comunidades Sostenibles</option>
+                            <option value="69">Educación de Calidad</option>
+                            <option value="72">Energía asequible y no contaminante</option>
+                            <option value="67">Hambre Cero</option>
+                            <option value="70">Igualdad de Género</option>
+                            <option value="74">Industria Innovación e infraestructura</option>
+                            <option value="81">Paz justicia e Instituciones solidas</option>
+                            <option value="77">Producción y consumo responsable</option>
+                            <option value="75">Reducción de Desigualdades</option>
+                            <option value="68">Salud y Bienestar</option>
+                            <option value="73">Trabajo Decente y crecimiento económico</option>
+                            <option value="80">Vida de Ecosistemas terrestres</option>
+                            <option value="79">Vida submarina</option>
+                        </select>
+                        <textarea type="text" name="texto" class="hidden" id="editor"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden"  id="tipo" name="tipo" value="">
+                    <div class="form-group form-inline">
+                        <input type='text' class='form-control' name='tags' id="tag" value="" placeholder="tags (Ej: tag1, tag2, tag3)">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary mform">+ Post</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="rm_pst" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h2 class="modal-title" id="myModalLabel">Eliminar Post</h2>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro que quieres borrar este post?</p>
+            </div>
+            <div class="modal-footer">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                    <a class="btn btn-danger" id="rm_real">Si, Eliminar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link href="/assets/css/jquery-te-1.4.0.css" rel="stylesheet">
+<script src="/assets/js/jquery-te-1.4.0.min.js"></script>
+<script src="/assets/js/ripples.min.js"></script>1
+<script src="/assets/js/material.min.js"></script>
+<script src="/assets/js/material-scrolltop.js"></script>
+<script src="/assets/js/main.js"></script>
+<script>
+    function preliminar(idpost){
+        $("#rm_real").attr("href","/delete_pst/" + idpost);
+        $("#rm_pst").modal("toggle");
+    };
+</script>
+<script type="text/javascript">
+    var quill = false;
+    $(document).on("click", ".poster", function() {
+        var data = {};
+        $("#t_princ").val("");
+        $("#editor").val("");
+        data.tipo = $(this).data('tipo');
+        $(".modal-footer #tipo").val(data.tipo);
+        switch(data.tipo) {
+            case 1:
+                $("#t_princ").attr("placeholder","Paz Mundial");
+                $("#preview").html("");
+                $("#fail").addClass("hidden");
+                $("#t_princ").removeClass("hidden");
+                break;
+            case 2:
+                $("#t_princ").attr("placeholder","Título");
+                $("#fail").addClass("hidden");
+                $("#preview").html("");
+                $("#t_princ").removeClass("hidden");
+                break;
+            case 3:
+                $("#preview").html("");
+                $("#t_princ").attr("placeholder","Url Imagen");
+                $("#t_princ").removeClass("hidden");
+                $("#fail").removeClass("hidden");
+                break;
+            case 4:
+                $("#preview").html("");
+                $("#t_princ").attr("placeholder","Url Video (Youtube,Vimeo,Dailymotion)");
+                $("#fail").addClass("hidden");
+                $("#t_princ").removeClass("hidden");
+                break;
+            default:
+                status = "inactivo";
+        }
+        if(parseInt(data.tipo) > 1){
+            $(".modal-body #catego").removeClass("hidden");
+            if(!quill){
+                $("#editor").jqte({
+                    color: false,
+                    source: false,
+                    sub: false,
+                    sup: false,
+                    strike: false,
+                    indent: false,
+                    format: false,
+                    outdent: false
+                });
+                quill = true;
+            }
+        } else {
+            $(".modal-body #catego").addClass("hidden");
+            if(quill){
+                $("#editor").jqte({
+                    color: false,
+                    source: false,
+                    sub: false,
+                    sup: false,
+                    strike: false,
+                    indent: false,
+                    format: false,
+                    outdent: false
+                });
+            }
+            quill = false;
+        }
+    });
+    $(document).on("click", ".edit", function() {
+        var data = {};
+        data.tipo = $(this).data('tipo');
+        $("#mform").attr('action','/post/edit/' + $(this).data('idpost'));
+        $(".modal-footer #tipo").val($(this).data('tipo'));
+        $("#tag").val("");
+        if(parseInt(data.tipo) > 1){
+            $(".modal-body #catego").removeClass("hidden");
+            if(!quill){
+                $("#editor").jqte({
+                    color: false,
+                    source: false,
+                    sub: false,
+                    sup: false,
+                    strike: false,
+                    indent: false,
+                    format: false,
+                    outdent: false
+                });
+                quill = true;
+            }
+        } else {
+            $(".modal-body #catego").addClass("hidden");
+            if(quill){
+                $("#editor").jqte({
+                    color: false,
+                    source: false,
+                    sub: false,
+                    sup: false,
+                    strike: false,
+                    indent: false,
+                    format: false,
+                    outdent: false
+                });
+            }
+            quill = false;
+        }
+        switch(data.tipo) {
+            case 1:
+                $("#t_princ").val($(this).data('tit'));
+                $("#editor").jqteVal($(this).data('cont'));
+                $("#tag").val($(this).data('tags'));
+                break;
+            case 2:
+                $("#t_princ").val($(this).data('tit'));
+                $("#editor").jqteVal($(this).data('cont'));
+                break;
+            case 3:
+                $("#t_princ").val($(this).data('tit'));
+                $("#editor").jqteVal($(this).data('cont'));
+                break;
+            case 4:
+                $("#t_princ").val($(this).data('tit'));
+                $("#editor").jqteVal($(this).data('cont'));
+                break;
+            default:
+                status = "inactivo";
+        }
+    });
+    $.material.init();
+    $('body').materialScrollTop();
+
+
+    $(function () {
+        $(".mform").click( function(e){
+            e.preventDefault();
+            $(this).attr('disabled',true);
+            var formArray = $("#mform").serializeArray();
+            var returnArray = {};
+            for (var i = 0; i < formArray.length; i++){
+                returnArray[formArray[i]['name']] = formArray[i]['value'];
+            }
+            returnArray.tipo = $("#tipo").val();
+            $.ajax({
+                url: "/post/add",
+                type: 'POST',
+                data: returnArray,
+                success: function(data){
+                    if(data != "no"){
+                        $("#aa .modal-body").html("<div class='alert alert-success'><strong>Bien!</strong> tu post fue enviado a moderación</div>");
+                        $("#aa .modal-footer").html("");
+                        setTimeout(function(){
+                            window.location.href = "/usr_post";
+                        },2000);
+                    }
+                }
+            });
+        });
+        $(".blog-post-meta :input.hidden").each(function (j) {
+            var tagger = $(this).val();
+            var idpost = "#" + $(this).data('id');
+            tagger = tagger.split(",");
+            for(var i = 0; i < tagger.length;i++){
+                if(tagger[i] != "null") {
+                    tagger[i] = tagger [i].split("@");
+                    $(idpost + " .blog-post-meta").append('<a href="/tagbsq/' + tagger[i][1] + '" class="label label-light label-primary">' + tagger[i][0] + '</a> ');
+                    $(this).val("");
+                } else $(idpost + " .blog-post-meta").append('<span class="label label-light label-primary">idea</span> ');
+
+            }
+        });
+        $(".blog-post-share :input.laiktoken").each(function (j) {
+            var tagger = $(this).val();
+            var idpost = "#" + $(this).data('id');
+            tagger = tagger.split(",");
+            for(var i = 0; i < tagger.length;i++){
+                if(tagger[i] == <%= usr.iduser%>) {
+                    $(idpost + " .laik").removeClass("btn-inverse");
+                    $(idpost + " .laik").addClass("btn-success");
+                    $(this).val("");
+                }
+            }
+        });
+        $(".comm").click(function (e) {
+            var data = {};
+            data.idpost = $(this).data('id');
+            var like = $(this);
+            $.ajax({
+                type: 'POST',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                url: '/pstcomment_stream',
+                success: function(data) {
+                    $("#"+like.data('id') + " .panel-footer").html(data);
+                    $("#"+like.data('id') + " .panel-footer").toggle("collapse");
+                }
+            });
+        });
+        $('.laik').click(function(e){
+            /*$.ajax({
+             dataType: 'jsonp',
+             data: "data=yeah",
+             jsonp: 'callback',
+             url: 'http://localhost:3000/endpoint?callback=?',
+             success: function(data) {
+             console.log('success');
+             console.log(JSON.stringify(data));
+             }
+             });*/
+            var data = {};
+            data.idpost = $(this).data('id');
+            var like = $(this);
+            $.ajax({
+                type: 'POST',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                url: '/send_laik',
+                success: function(data) {
+                    if(data != "no"){
+                        like.html(data.html);
+                        like.removeClass("btn-inverse");
+                        like.removeClass("btn-success");
+                        like.addClass(data.newlaik);
+                    }
+                }
+            });
+            e.preventDefault();
+            /*$.ajax('http://localhost:3000/endpoint', {
+             type: 'POST',
+             data: JSON.stringify(data),
+             contentType: 'application/json',
+             success: function() { console.log('success');},
+             error  : function() { console.log('error');}
+             });*/
+        });
+
+    });
+
+    function upload(e){
+
+        if (!e.files) {
+            alert("This browser doesn't seem to support the `files` property of file inputs.");
+        }
+        else if (!e.files[0]) {
+            alert("Porfavor seleccione algún archivo");
+        }
+        else {
+            var formData = new FormData();
+            formData.append("filetoupload", e.files[0]);
+            $(function (){
+               $.ajax({
+                   url: '/subir_pic',
+                   data: formData,
+                   cache: false,
+                   contentType: false,
+                   processData: false,
+                   type: 'POST',
+                   success: function(data){
+                       $("#preview").html("<img width='auto' class='img-responsive' src='" + data + "' >");
+                       $("#avat").val(data);
+                       $("#t_princ").val(data);
+                       $("#t_princ").addClass("hidden");
+                   }
+               })
+            });
+        }
+
+    }
+</script>
+
+</body>
+</html>

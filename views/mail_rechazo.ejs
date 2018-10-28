@@ -1,0 +1,74 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Observa Ciudadania</title>
+</head>
+
+<body>
+<h1>Hola Ciudadano/a!</h1>
+<p>Te enviamos este mail pues uno de los post que hiciste fue rechazado por el siguiente motivo</p>
+<h3><%= razon%></h3>
+<%
+var f_gen = new Date(post.fecha);
+f_gen = f_gen.toLocaleString();%>
+<p>Post creado en <%= f_gen%></p>
+<%
+switch(post.tipo) {
+case 1:
+%>
+    <div class="row">
+        <h2 class="page-header"><%= post.t_principal%></h2>
+    </div>
+<%
+    break;
+case 2:
+%>
+<div class="row">
+    <h2 class="page-header"><%= post.t_principal%></h2>
+    <p><%- post.contenido%></p>
+</div>
+<%
+
+    break;
+case 3:
+%>
+<div class="row">
+    <img src="<%= post.t_principal%>" width="auto" class="img-responsive">
+    <p><%- post.contenido%></p>
+</div>
+<%
+    break;
+case 4:
+%>
+<div class="row">
+    <iframe width="100%" height="372" src="https://www.youtube.com/embed/<%= post.t_principal%>?rel=0&amp;showinfo=0" frameborder="0" allowfullscreen=""></iframe>
+    <p><%- post.contenido%></p>
+</div>
+<%
+    break;
+    default:
+        status = "inactivo";
+}
+%>
+<% switch(tipo){
+    case 1:
+        %>
+    <p>Rechazado por el Monitor de tu observatorio el cual comentó:</p>
+    <p>"<%= comm%>"</p>
+    <p>Si quieres editar tu post y enviarlo nuevamente hazlo en la sección "Mis Posts" o simplemente haz click <a href="app.observaciudadania.org/usr_post">aquí</a></p>
+<%
+    break;
+    case 2:%>
+<p>Rechazado por un moderador</p>
+<%
+    break;
+    default:
+        var hola = true;
+}%>
+
+
+</body>
+</html>

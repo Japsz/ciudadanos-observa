@@ -1,0 +1,59 @@
+<%- include ../../layouts/admin_header.ejs %>
+<h2 class="page-header">Moderar Avances de proyectos</h2>
+<div class="row placeholders">
+    <% if(data.length){
+        for(var i = 0;i<data.length;i++){%>
+    <form action="/mod" method="post">
+        <div class="panel col-md-5 well-lg">
+            <div class="panel-heading">
+                <h2><%=data[i].titulo%></h2>
+            </div>
+            <div class="panel-body text-left">
+                <h3><%= data[i].token[0]%></h3>
+                <p><%- data[i].texto1%></p>
+                <h3><%= data[i].token[1]%></h3>
+                <p><%- data[i].texto2%></p>
+            </div>
+            <div class="panel-footer" style="display: flex;">
+                <img src="<%= data[i].iconouser%>" style="margin: 0;height: 30px" width="30px" class="img-circle img-responsive">
+                <h5 style="margin-left: 10px"><%= data[i].username%></h5>
+                <input type="hidden" name="idpost" value="<%= data[i].idpostinterno%>">
+                <button type="submit" value="si" name="resp" class="btn btn-success" style="margin-left:10px"><i class="glyphicon glyphicon-ok"></i></button>
+                <a data-toggle="modal" href="#comm" class="btn btn-danger" style="margin-left:10px"><i class="glyphicon glyphicon-remove"></i></a>
+            </div>
+        </div>
+    </form>
+        <div class="modal fade" id="comm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h2 class="modal-title" id="myModalLabel">Notificación de rechazo</h2>
+                    </div>
+                    <form action="/mod" method="post">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Observaciones:</label>
+                            <input type="textarea" row="3" class="form-control" style="resize: none" name="comment">
+                            <input type="hidden" name="idpost" value="<%= data[i].idpostinterno%>">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="form-group form-inline">
+                            <div class="btn-group">
+                                <a class="btn btn-default" data-dismiss="modal">Cancelar</a>
+                                <button type="submit" value="no" name="resp" class="btn btn-danger">Rechazar</button>
+                            </div>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <%  }
+    }else {%>
+    <h3>No hay Avances pendientes</h3>
+    <%}%>
+</div>
+
+<%- include ../../layouts/footer.ejs %>

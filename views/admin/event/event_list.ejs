@@ -1,0 +1,25 @@
+<%- include ../../layouts/admin_header.ejs %>
+    <h2 class="page-header">Eventos <a class="btn btn-info pull-right" href="/add_event"> + <span class="glyphicon glyphicon-globe" aria-hidden="true"></span> Nuevo</a> </h2>
+    <div class="row placeholders">
+        <%
+        if(data.length){
+            for(var i = 0;i < data.length; i++){
+        %>
+        <div class="col-sm-3 col-xs-6">
+            <h3><%= data[i].nombre%></h3>
+            <div class="btn-group">
+                <a href="/evnt/<%= data[i].idevento%>" class="btn btn-info"><span class="glyphicon glyphicon-eye-open"  aria-hidden="true"></span> Ver</a>
+            </div>
+
+        </div>
+        <%
+        }
+        } else{%>
+        <div class="col-sm-6 col-xs-12">
+            <a>No hay Eventos</a>
+        </div>
+        <%
+        }
+        %>
+    </div>
+<%- include ../../layouts/footer.ejs %>

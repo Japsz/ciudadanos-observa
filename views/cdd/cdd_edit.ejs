@@ -1,0 +1,55 @@
+<%- include ../layouts/user_header.ejs %>
+<div class="container blog-content">
+
+    <div class="row">
+
+        <div class="col-sm-8 blog-main">
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <section class="blog-post">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="blog-post-meta">
+                                    <h1 class="blog-post-title">Edición de perfil</h1>
+                                </div>
+                                <div class="blog-post-content">
+                                    <form action="/cdd/edit" method="POST">
+                                        <input name="avatr" id="avat" value="<%=data.avatar_pat%>" class="hidden">
+                                        <div class="input-group" id="fail">
+                                            <div id="preview"><img class="img-responsive img-circle" src="<%=data.avatar_pat%>" width="100px" height="auto"></div>
+                                            <label>Sube tu Avatar</label>
+                                            <input type="file" name="filetoupload"  onchange="upload(this)">
+                                        </div>
+                                        <label for="userame">Usuario</label>
+                                        <input type="text" class="form-control" name="username" value="<% if(data.username){%><%= data.username%><%}%>" required>
+                                        <label for="correo">Correo</label>
+                                        <input type="text" class="form-control" name="correo" value="<% if(data.correo){%><%= data.correo%><%}%>" required>
+                                        <label for="name">Nombre</label>
+                                        <input type="text" class="form-control" name="name" value="<% if(data.nombre){%><%= data.nombre%><%}%>" required>
+                                        <label for="ape">Apellido</label>
+                                        <input type="text" class="form-control" name="ape" value="<% if(data.apellido){%><%= data.apellido%><%}%>" required>
+                                        <label for="comuna">Comuna</label>
+                                        <input type="text" class="form-control" name="comuna" value="<% if(data.comuna){%><%= data.comuna%><%}%>" required>
+                                        <label for="fnac">Fecha de Nacimiento</label>
+                                        <input type="date" class="form-control" name="fnac" value="<% if(data.fnac){%><%= new Date(data.fnac).toLocaleDateString()%><%}%>" required>
+                                        <label for="gend">Sexo</label>
+                                        <select class="form-control" name="gend">
+                                            <option value="1" <% if(data.gender == 1){%>selected<%}%>>F</option>
+                                            <option value="0" <% if(data.gender == 0){%>selected<%}%>>M</option>
+                                        </select>
+                                        <div class="form-group form-inline pull-right">
+                                            <a type="submit" class="form-control btn btn-danger">Cancelar</a>
+                                            <button type="submit" class="form-control btn btn-primary">Guardar cambios</button>
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+        </div><!-- /.blog-main -->
+<%- include ../layouts/cdd_footer.ejs %>

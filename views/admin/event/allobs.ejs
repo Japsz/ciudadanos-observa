@@ -1,0 +1,17 @@
+<%
+if(data.length){
+for(var i = 0;i < data.length; i++){
+%>
+<tr>
+    <td><%= data[i].nom%></td>
+    <td><%= data[i].instnom%></td>
+    <td><%= data[i].comuna%></td>
+    <td><a class="btn btn-danger" href="#">- Quitar</a></td>
+</tr>
+<%
+}
+} else{%>
+<tr><td>No se encontraron observatorios</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+<%
+}
+%>

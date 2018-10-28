@@ -1,0 +1,89 @@
+<%- include layouts/admin_header.ejs %>
+            <h1 style="margin-bottom: 40px">Usuarios en el sistema<a href="/user/add" class="btn btn-primary pull-right"><span class="fa fa-user"></span> + Añadir</a></h1>
+
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                <% if(data.length){ 
+                var usrtype;
+                 for(var i = 0;i < data.length;i++) {
+                    switch(data[i].tipo) {
+                        case 1:
+                            usrtype = "Monitor";
+                            break;
+                        case 2:
+                            usrtype = "Moderador";
+                            break;
+                        case 3:
+                            usrtype = "Ciudadano";
+                            break;
+                        default:
+                            usrtype = "notype";
+
+                    }%>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="heading<%= data[i].iduser%>">
+                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#<%= data[i].iduser%>" aria-expanded="true" aria-controls="<%= data[i].iduser%>">
+                                <h4 class="panel-title">
+                                        <%=data[i].username%> <small><%=data[i].correo%> | <%= usrtype%></small>
+                                </h4>
+                            </a>
+                        </div>
+                        <div id="<%= data[i].iduser%>" class="panel-collapse collapse<% if(i == 0){%> in<%}%>" role="tabpanel" aria-labelledby="heading<%= data[i].iduser%>">
+                            <table class="table table-responsive">
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Apellido</th>
+                                    <th>Contraseña</th>
+                                    <th>Fecha de Nacimiento</th>
+                                    <th>Género</th>
+                                    <th></th>
+                                </tr>
+                                <tr>
+                                    <td><%= data[i].nombre%></td>
+                                    <td><%= data[i].apellido%></td>
+                                    <td><%= data[i].password%></td>
+                                    <td><%= new Date(data[i].fnac).toLocaleDateString()%></td>
+                                    <td>
+                                        <%switch(data[i].gender){
+                                            case 1:
+                                                %>F<%
+                                            break;
+                                        case 0:%>M<%
+                                            break;
+                                            default:
+                                                %>Otro<%
+                                        }%>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                            <% if(data[i].tipo == 1 && data[i].obsinfo != null){%>
+
+                            <ul class="list-group">
+                                <h4 style="margin:10px" class="list-group-item-heading">Observatorios de <%=data[i].username%>:</h4>
+                                <%
+                                for(var j = 0;j<data[i].obsinfo.length;j++){%>
+                                <a href="/show_obs/<%=data[i].obsinfo[j][0]%>"><li class="list-group-item"><strong><%=data[i].obsinfo[j][1]%></strong>  (<small><%=data[i].obsinfo[j][2]%></small>)</li></a>
+                                <%}%>
+                            </ul>
+                            <%}%>
+                        </div>
+                    </div>
+
+            <%
+                    }
+
+                }else{ %>
+                 <tr>
+                    <td colspan="3">No contacts to call</td>
+                 </tr>
+            <% } %>
+
+                <tr>
+                    <td>
+
+                    </td>
+                </tr>
+                              
+            </table>
+        
+<%- include layouts/footer.ejs %>

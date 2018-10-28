@@ -1,0 +1,19 @@
+<%- include ../../layouts/admin_header.ejs %>
+<div id="success"></div>
+    <h3 class="page-header">Crear Institución</h3>
+    <div class="col-md-6">
+        <form class="form" action='/inst/add' method="POST">
+            <div class=form-group>
+                <label for="nom">Nombre Institución</label>
+                <input type="text" class="form-control" name="nom" required>
+                <label for="nom">Correo Contacto</label>
+                <input type="text" class="form-control" name="correo" required>
+                <label for="nom">Teléfono de contacto</label>
+                <input type="text" class="form-control" name="fono" required>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-lg btn-primary" type="submit">Crear</button>
+            </div>
+        </form>
+    </div>
+<%- include ../../layouts/footer.ejs %>

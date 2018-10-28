@@ -1,0 +1,6 @@
+<% if(data.length){
+    for(var i = 0;i<data.length;i++){%>
+    <label><input type="radio" name="idmonit" onclick="habilit()" value="<%= data[i].iduser%>" required><%= data[i].correo%></label>
+<%
+    }
+} else { %> <label><input type="radio" name="idmonit" disabled required>No hay monitores con tal correo</label> <%}%>

@@ -1,0 +1,90 @@
+<%- include ../layouts/user_header.ejs %>
+
+<div class="container blog-content">
+
+    <div class="row">
+
+        <div class="col-sm-12 blog-main">
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <section class="blog-post">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="blog-post-meta">
+                                    <h1 class="blog-post-title">Mis Observatorios</h1>
+                                </div>
+                                <div class="blog-post-content">
+                                    <%
+                                    if(data.length){
+                                        var status;
+                                    for(var i = 0;i < data.length; i++){
+                                        switch(data[i].estado) {
+                                            case 1:
+                                                status = "Inactivo";
+                                                break;
+                                            case 2:
+                                                status = "Activo";
+                                                break;
+                                            case 3:
+                                                status = "Archivado";
+                                                break;
+                                            default:
+                                                status = "inactivo";
+                                        }
+                                    %>
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            <img src="<%= data[i].avatar_pat %>" width="150px" height="150px">
+                                        </div>
+                                        <div class="col-sm-8 col-sm-offset-1">
+                                            <h3><%= data[i].nom%></h3>
+                                            <h5>Máximo de Integrantes: <%= data[i].max%></h5>
+                                            <a class="btn btn-primary pull-right" href="/obs_usr/<%= data[i].idobservatorio%>">Ciudadanos</a>
+                                            <a class="btn btn-warning pull-right" href="/app_post/<%= data[i].idobservatorio%>">Moderar Posts</a>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <%
+                                    }
+                                    } else{%>
+                                    <div class="col-sm-6 col-xs-12">
+                                        <p>No tienes Observatorios asignados</p>
+                                    </div>
+                                    <%
+                                    }
+                                    %>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+        </div><!-- /.blog-main -->
+
+    </div><!-- /.row -->
+
+</div><!-- /.container -->
+
+
+<%- include ../layouts/footer_x.ejs %>
+
+<script type="text/javascript">
+    $(function(){
+        $(".blog-post-meta :input.hidden").each(function (j) {
+            var tagger = $(this).val();
+            var idpost = "#" + $(this).data('id');
+            tagger = tagger.split(",");
+            for(var i = 0; i < tagger.length;i++){
+                if(tagger[i] != "null") {
+                    $(idpost).append('<span class="label label-light label-primary">' + tagger[i] + '</span> ');
+                } else $(idpost).append('<span class="label label-light label-primary">jeje</span> ');
+
+            }
+        })
+
+    });
+</script>
+</body>
+</html>

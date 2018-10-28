@@ -1,0 +1,155 @@
+<%- include ../../layouts/admin_header.ejs %>
+<div class="row">
+    <h2 class="page-header">Evento: <%= evnt.nombre%> <button class="btn btn-info" style="margin-left: 10px" aria-expanded="false" aria-controls="info" data-toggle="collapse" data-target="#info"><span class="glyphicon glyphicon-info-sign" ></span></button> </h2>
+    <div class="collapse" id="info">
+        <div class="well">
+            <h4>Likes por etapa: <%= evnt.likes%></h4>
+            <h4>Nuevos por etapa: <%= evnt.likes%></h4>
+            <br>
+            <h3 style="margin:5px">Etapas</h3>
+            <ol>
+                <% for(var i = 0;i<evnt.info.length;i++){%>
+                <li>Nombre: <%= evnt.info[i][0]%>
+                    <ul class="list-group">
+                        <li class="list-group-items">P1: <%= evnt.info[i][1]%></li>
+                        <li class="list-group-items">P2: <%= evnt.info[i][2]%></li>
+                    </ul>
+                </li>
+                <%}%>
+            </ol>
+        </div>
+    </div>
+    <h2>Observatorios participantes</h2>
+    <div class="table table-responsive">
+    <table class="table">
+        <tr>
+            <th>Nombre</th>
+            <th>Institución</th>
+            <th>Comuna</th>
+            <th></th>
+        </tr>
+        <tbody id="totales">
+    <%
+    if(data.length){
+        var status;
+    for(var i = 0;i < data.length; i++){
+    %>
+    <tr id="<%=data[i].idevento%>">
+        <td><%= data[i].nom%></td>
+        <td><%= data[i].instnom%></td>
+        <td><%= data[i].comuna%></td>
+        <td><a class="btn btn-danger" href="">- Quitar</a></td>
+    </tr>
+    <%
+    }
+    } else{%>
+    <tr><td>No se encontraron observatorios</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+    <%
+    }
+    %>
+        </tbody>
+    </table>
+    </div>
+</div>
+<div class="row">
+    <h2 class="page-header">Agregar Observatorios</h2>
+    <label>Buscar por:</label>
+    <div class="form-group form-inline">
+        <input type="text" onchange="strim()" onkeyup="strim()" placeholder="Nombre del Observatorio" class="form-control" name="nom">
+        <input type="text" onchange="strim()" onkeyup="strim()" placeholder="Nombre de la institución" class="form-control" name="instnom">
+        <input type="text" onchange="strim()" onkeyup="strim()" placeholder="Comuna" class="form-control" name="comuna">
+    </div>
+    <div class="table-responsive">
+        <table class="table">
+            <tr>
+                <th>Nombre</th>
+                <th>Institucion</th>
+                <th>Comuna</th>
+            </tr>
+            <tbody id="fila"><tr><td>No se encontraron observatorios</td><td>-</td><td>-</td><td>-</td><td>-</td></tr></tbody>
+        </table>
+    </div>
+</div>
+<div class="modal fade" id="obs" tabindex="-1" role="dialog" >
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Crear Observatorio</h4>
+            </div>
+            <form action="/obs/add" method="POST">
+                <div class="modal-body">
+                    <label>Nombre</label>
+                    <input type="text" name="nom" class="form-control" required>
+                    <label>Máximo de Integrantes</label>
+                    <input type="text" name="maxim" class="form-control" required>
+                    <label>Monitor</label>
+                    <input type="text" id="mailkeyup" name="corr" class="form-control">
+                    <div id="monids" class="radio"></div>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                        <button type="submit" id="continue" name="id" value="" class="btn btn-primary" disabled>Modificar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    function strim() {
+        var nom = document.getElementsByName("nom")[0].value;
+        var ape = document.getElementsByName("instnom")[0].value;
+        var verif = document.getElementsByName("comuna")[0].value;
+        var dats = {nom: nom, ape: ape, verif: verif, idevnt: <%= evnt.idevento%>};
+        if(nom == "" && ape == "" && verif == ""){
+            document.getElementById("fila").innerHTML = "<tr><td>No se encontraron observatorios</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>";
+            return;
+        }
+        if (window.XMLHttpRequest) {
+            // code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp = new XMLHttpRequest();
+        } else {
+            // code for IE6, IE5
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                if (this.responseText != "0") {
+                    $("#fila").html(this.responseText);
+                }
+            }
+        };
+        xmlhttp.open("POST", "/obs_stream", true);
+        xmlhttp.setRequestHeader("Content-type", 'application/json');
+        xmlhttp.send(JSON.stringify(dats));
+    }
+</script>
+<script type="text/javascript">
+
+    $(function () {
+        var data;
+
+        $("#mailkeyup").keyup( function() {
+            data = { corr : $(this).val()};
+            $("#continue").attr("disabled", true);
+            if(data.corr.length >= 2){
+                $.ajax({
+                    type: 'POST',
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
+                    url: '/monit_stream',
+                    success: function(data) {
+                        $("#monids").html(data);
+                        console.log(data);
+                    }
+                });
+            }
+        });
+    });
+    function habilit(){
+        $("#continue").attr("disabled", false);
+    };
+</script>
+<%- include ../../layouts/footer.ejs %>

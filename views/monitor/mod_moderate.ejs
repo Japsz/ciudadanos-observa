@@ -1,0 +1,77 @@
+<%- include ../layouts/mod_header.ejs %>
+<div class="row coments">
+    <h1>Posts</h1>
+    <table class="table table-responsive">
+        <tr>
+            <th width="50px">No</th>
+            <th>Post</th>
+            <th>Usuario</th>
+            <th>Tags</th>
+            <th></th>
+            <th></th>
+        </tr>
+
+        <% if(data.length){
+         for(var i = 0;i < data.length;i++) {
+        %>
+
+        <tr id="<%= data[i].idpost%>">
+            <td><%=(i+1)%></td>
+            <td><%if(data[i].tipo == "4"){%><%- data[i].t_principal%><%} else {%><%=data[i].t_principal%><%}%></td>
+            <td><%=data[i].username%></td>
+            <td><%=data[i].tagz%></td>
+            <td>
+                <a class="btn btn-success btn-xs a-inside comm" data-id="<%= data[i].idpost%>" data-comment="0" href="#"><i class="glyphicon glyphicon-ok"></i></a>
+            </td>
+            <td>
+                <a class="btn btn-danger btn-xs a-inside laik" data-toggle="modal" data-target="#rm" data-comment="0" data-id="<%= data[i].idpost%>" data-iduser="<%=data[i].iduser%>" href="#"><i class="glyphicon glyphicon-remove"></i></a>
+            </td>
+        </tr>
+    <% }
+
+     }else{ %>
+         <tr>
+            <td colspan="3">No hay posts por moderar</td>
+         </tr>
+    <% } %>
+
+    </table>
+</div>
+<div class="row coments">
+    <h1>Comentarios</h1>
+    <table class="table table-responsive">
+        <tr>
+            <th width="50px">No</th>
+            <th>Contenido</th>
+            <th>Usuario</th>
+            <th></th>
+        </tr>
+
+        <% if(data2.length){
+        for(var i = 0;i < data2.length;i++) {
+        %>
+
+        <tr id="c<%= data2[i].idcomentario%>">
+            <td><%=(i+1)%></td>
+            <td><%=data2[i].texto%></td>
+            <td><%=data2[i].username%></td>
+            <td>
+                <a class="btn btn-success btn-xs a-inside comm" data-id="<%= data2[i].idcomentario%>" data-comment="1" href="#"><i class="glyphicon glyphicon-ok"></i></a>
+            </td>
+            <td>
+                <a class="btn btn-danger btn-xs a-inside laik" data-toggle="modal" data-target="#rm" data-comment="1" data-id="<%= data2[i].idcomentario%>" data-iduser="<%=data2[i].iduser%>" href="#"><i class="glyphicon glyphicon-remove"></i></a>
+            </td>
+        </tr>
+        <% }
+
+        }else{ %>
+        <tr>
+            <td colspan="3">No hay posts por moderar</td>
+        </tr>
+        <% } %>
+
+    </table>
+
+</div>
+        
+<%- include ../layouts/footer.ejs %>

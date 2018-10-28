@@ -1,0 +1,32 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Observa Ciudadania</title>
+</head>
+
+<body>
+<h1>Hola Ciudadano/a!</h1>
+<p>Te escribimos para informarte que el avance de etapa para tu proyecto "<a href="app.observaciudadania.org/lab/proy/get/<%= data.idproyecto%>"><%= data.titulo%></a> fue <%= estado%>"</p>
+
+<% switch(estado){
+    case "aprobado":
+        %>
+    <p>Accede a el <a href="app.observaciudadania.org/intern/<%= data.idproyecto%>">muro interno</a> de tu proyecto para ver las nuevas preguntas y requisitos que necesitas para seguir avanzando.</p>
+    <p>Ahora a seguir trabajando para hacer realidad tu proyecto!</p>
+<%
+    break;
+    case "rechazado":
+%>
+<p>y el que revisó tu proyecto dijo: </p>
+<p style="margin: 50px;"class="text-center"><%= comm%></p>
+<p>Si quieres revisar y/o reeditar el avance rechazado ve al muro de tu proyecto o simplemente has click <a href="app.observaciudadania.org/lab/intern/<%= data.idproyecto%> ">aquí</a></p>
+<%
+    break;
+    default:
+        var hola = true;
+}%>
+
+</body>
+</html>

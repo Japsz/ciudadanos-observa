@@ -1,0 +1,147 @@
+<% var key = new Date().toLocaleString();
+    key = key.replace(/\:|\ |\/|\,/gm,"")%>
+<div id="<%= key%>">
+<% if(data.length) {
+    var f_gen;
+for(var i = 0;i<data.length;i++){
+    f_gen = new Date(data[i].fecha);
+    f_gen = f_gen.toLocaleString();
+%><section class="blog-post" id="<%= data[i].idpost %>">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <%if(data[i].tipo == 3){%>
+            <img src="<%= data[i].t_principal%>" style="margin: auto;display: block;" width="auto" class="img-responsive">
+            <%} else if(data[i].tipo == 4){%>
+            <%- data[i].t_principal%>
+            <%}%>
+            <div class="blog-post-meta">
+                <input class="hidden" value="<%= data[i].tagz%>" data-id="<%= data[i].idpost%>">
+                <p class="blog-post-date pull-right"><%= f_gen%></p>
+            </div>
+            <div class="blog-post-content">
+                <%
+                switch(data[i].tipo) {
+                case 1:
+                %>
+                <a href="/post/<%= data[i].idpost%>">
+                    <h2 class="blog-post-title"><%= data[i].t_principal%></h2>
+                </a><%
+                    break;
+                case 2:%>
+                <a href="/post/<%= data[i].idpost%>">
+                    <h2 class="blog-post-title"><%= data[i].t_principal%></h2>
+                </a>
+                <p><%- data[i].contenido%></p>
+                <%
+                    break;
+                default:%>
+                <p><%- data[i].contenido%></p>
+                <%  break;
+                }%>
+                <div class="blog-post-share pull-left" style="display: flex">
+                    <img src="<%= data[i].iconouser%>" style="margin: 0;height: 30px" width="30px" class="img-circle img-responsive">
+                    <h5 style="margin-left: 10px"><%= data[i].username%></h5>
+                </div>
+                <div class="blog-post-share pull-right">
+                    <input type="hidden" class="laiktoken" value="<%=data[i].laiktoken%>" data-id="<%= data[i].idpost%>">
+                    <a class="stream_comm btn btn-info" data-id="<%= data[i].idpost%>">
+                        <i class="glyphicon glyphicon-comment"></i> Ver Comentarios
+                    </a>
+                    <a class="loik btn btn-inverse" onclick="laik(this)" data-id="<%= data[i].idpost%>">
+                        <i class="glyphicon glyphicon-thumbs-up"></i> <%= data[i].likes%>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer blog-comments collapse">
+        </div>
+
+    </div>
+</section><%
+}
+}%>
+</div>
+<script type="text/javascript">
+    $("#<%= key%> .stream_comm").click(function (e) {
+        var data = {};
+        data.idpost = $(this).data('id');
+        var like = $(this);
+        $.ajax({
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            url: '/pstcomment_stream',
+            success: function(data) {
+                $("#"+like.data('id') + " .panel-footer").html(data);
+                $("#"+like.data('id') + " .panel-footer").toggle("collapse");
+            }
+        });
+    });
+    function laik(esto){
+        $(function(){
+            /*$.ajax({
+             dataType: 'jsonp',
+             data: "data=yeah",
+             jsonp: 'callback',
+             url: 'http://localhost:3000/endpoint?callback=?',
+             success: function(data) {
+             console.log('success');
+             console.log(JSON.stringify(data));
+             }
+             });*/
+            var data = {};
+            data.idpost = $(esto).data('id');
+            var like = $(esto);
+            $.ajax({
+                type: 'POST',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                url: '/send_laik',
+                success: function(data) {
+                    if(data != "no"){
+                        like.html(data.html);
+                        like.removeClass("btn-inverse");
+                        like.removeClass("btn-success");
+                        like.addClass(data.newlaik);
+                    }
+                }
+            });
+            /*$.ajax('http://localhost:3000/endpoint', {
+             type: 'POST',
+             data: JSON.stringify(data),
+             contentType: 'application/json',
+             success: function() { console.log('success');},
+             error  : function() { console.log('error');}
+             });*/
+        });
+
+    }
+    $("#<%= key%> .blog-post-meta :input.hidden").each(function (j) {
+        var tagger = $(this).val();
+        var idpost = "#" + $(this).data('id');
+        tagger = tagger.split(",");
+        for(var i = 0; i < tagger.length;i++){
+            if(tagger[i] != "null") {
+                tagger[i] = tagger [i].split("@");
+                $(idpost + " .blog-post-meta").append('<a href="/tagbsq/' + tagger[i][1] + '" class="label label-light label-primary">' + tagger[i][0] + '</a> ');
+                $(this).val("");
+            } else {
+                $(idpost + " .blog-post-meta").append('<span class="label label-light label-primary">idea</span> ');
+                $(this).val("");
+            }
+
+        }
+    });
+    $("#<%= key%> .blog-post-share :input.laiktoken").each(function (j) {
+        var tagger = $(this).val();
+        var idpost = "#" + $(this).data('id');
+        tagger = tagger.split(",");
+        for(var i = 0; i < tagger.length;i++){
+            if(tagger[i] == <%= usr.iduser%>) {
+                $(idpost + " .loik").removeClass("btn-inverse");
+                $(idpost + " .loik").addClass("btn-success");
+                $(this).val("");
+            }
+        }
+    });
+</script>

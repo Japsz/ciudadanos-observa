@@ -1,0 +1,61 @@
+<% var key = new Date().toLocaleString();
+key = key.replace(/\:|\ |\/|\,/gm,"")%>
+<div id="<%= key%>">
+<h2 class="blog-post-title">Comentarios</h2>
+    <form id="cmntform">
+        <div class="well" style="display: flex;margin:auto;height:150px">
+            <img class="img-responsive img-circle pull-left" style="margin-top: 0;display: block" width="60px" height="auto" src="<%= usr.avatar_pat%>">
+            <textarea class="form-control" placeholder="Introduce tu comentario aquí" name="texto" type="text" id="commtxt" style="margin-left: 10px; height:auto"></textarea>
+            <button class="btn btn-primary send_comm" type="submit" name="idpost" style="height: auto" value="<%= data%>">Enviar</button>
+        </div>
+    </form>
+    <hr>
+    <% if(comments.length) {
+        var f_gen;
+    for(var i = 0; i < comments.length; i++){
+        f_gen = new Date(comments[i].fecha);
+        f_gen = f_gen.toLocaleString();
+    %>
+    <div class="well" style="display: flex;margin:auto;height:auto">
+
+        <div style="width: 20%;display: table;margin: 5px">
+            <img class="img-circle img-responsive" style="display:block" width="60px" height="auto" src="<%= comments[i].avatar_pat%>">
+            <p style="margin-top: 5px;font-size: larger;text-align: center"><b><%= comments[i].username%></b></p>
+        </div>
+        <p style="margin-left: 10px ;margin-top: 40px;font-size: large;text-align: left;width:65%"><%= comments[i].texto%></p>
+        <p style="width: 15%"><%= f_gen%></p>
+
+    </div>
+    <hr>
+    <%  }
+    } else {
+    %>
+    <div class="well">
+        <h4>No hay comentarios aún, Se el primero!</h4>
+    </div>
+    <% }%>
+</div>
+<script type="text/javascript">
+    $(function(){
+        $("#<%= key%> .send_comm").click(function (e) {
+            e.preventDefault();
+            var data = {};
+            data.idpost = $(this).val();
+            data.texto = $("#"+$(this).val() + " #commtxt").val();
+            var like = $(this);
+            $.ajax({
+                type: 'POST',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                url: '/comment/add',
+                success: function(data) {
+                    $("#"+like.val() + " .panel-footer").html(data);
+                    $("#"+like.val() + " .panel-footer").removeClass("hidden");
+                    $("#"+like.val() + " .panel-footer").fadeIn(600,function(){
+                        console.log("fin");
+                    });
+                }
+            });
+        })
+    })
+</script>

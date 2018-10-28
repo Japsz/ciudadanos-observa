@@ -1,0 +1,45 @@
+<%- include ../layouts/user_header.ejs %>
+<div class="container blog-content">
+
+    <div class="row">
+
+        <div class="col-sm-8 blog-main">
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <section class="blog-post">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="blog-post-meta">
+                                    <h1 class="blog-post-title">Edición de perfil<a class="btn btn-info pull-right" href="/cdd_cedit"><i class="glyphicon glyphicon-wrench"></i> Editar perfil</a></h1>
+                                </div>
+                                <div class="blog-post-content">
+
+                                    <img class="img-responsive img-circle center-block" width="60px" height="auto" src="<%=data.avatar_pat%>">
+                                    <label for="userame">Usuario</label>
+                                    <p><% if(data.username){%><%= data.username%><%}%></p>
+                                    <label for="correo">Correo</label>
+                                    <p><% if(data.correo){%><%= data.correo%><%}%></p>
+                                    <label for="name">Nombre</label>
+                                    <p><% if(data.nombre){%><%= data.nombre%><%}%></p>
+                                    <label for="ape">Apellido</label>
+                                    <p><% if(data.apellido){%><%= data.apellido%><%}%></p>
+                                    <label for="comuna">Comuna</label>
+                                    <p><% if(data.comuna){%><%= data.comuna%><%}%></p>
+                                    <label for="fnac">Fecha de Nacimiento</label>
+                                    <p><% if(data.fnac){%><%= new Date(data.fnac).toLocaleDateString()%><%}%></p>
+                                    <label for="gend">Sexo</label>
+                                    <% switch(data.gender){
+                                        case "0":%><p>M</p><%break;
+                                        case "1":%><p>F</p><%break;
+                                        default:%><p>No se encuentra</p><%
+                                    }%>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+        </div><!-- /.blog-main -->
+<%- include ../layouts/cdd_footer.ejs %>

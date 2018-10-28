@@ -1,0 +1,271 @@
+<%- include ../layouts/user_header.ejs %>
+<style>
+    .modalpost {
+        z-index: 0;
+        list-style-type: none;
+    }
+
+</style>
+
+<div class="container blog-content">
+
+    <div class="row">
+
+        <div class="col-md-12 blog-main">
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1 col-xs-12 col-sm-10 col-sm-offset-1">
+                    <ul class="menu boxed clearfix modalpost" aria-hidden="true">
+                        <li><img src="/assets/img/isov_iso.png" height="84px" height="auto"></li>
+                        <li><a href="#" ><i class="menu-icon"></i>Volver</a></li>
+                        <% if(obs.length){
+                        for(var i = 0;i < obs.length;i++){
+                        %>
+                        <li>
+                            <a href="/app_post/<%= obs[i].idobservatorio%>"><i class="menu-icon menu-icon-5"></i><%= obs[i].nom%></a>
+                        </li>
+                        <%
+                        }
+                        }%>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-8 col-sm-offset-2" id="psts">
+                    <% if(data.length) {
+                        var f_gen;
+                    for(var i = 0;i<data.length;i++){
+                        f_gen = new Date(data[i].fecha);
+                        f_gen = f_gen.toLocaleString();
+                            switch(data[i].tipo) {
+                    case 1:
+                    %><section class="blog-post" id="<%= data[i].idpost%>">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="blog-post-meta" >
+                                    <input class="hidden" value="<%= data[i].tags%>" data-id="<%= data[i].idpost%>">
+                                    <p class="blog-post-date pull-right"><%= f_gen%></p>
+                                </div>
+                                <div class="blog-post-content">
+                                    <a href="/post/<%= data[i].idpost%>">
+                                        <h2 class="blog-post-title"><%= data[i].t_principal%></h2>
+                                    </a>
+                                    <a class="blog-post-share pull-left" href="#">
+                                        Creado por: <%= data[i].username%>
+                                    </a>
+                                    <div class="blog-post-share pull-right">
+                                        <a class="comm btn btn-success" data-id="<%= data[i].idpost%>" style="display: inline-block">
+                                            <i class="glyphicon glyphicon-thumbs-up"></i> Aprobar
+                                        </a>
+                                        <a class="laik btn btn-danger" data-toggle="modal" data-target="#rm" data-id="<%= data[i].idpost%>" style="display: inline-block">
+                                            <i class="glyphicon glyphicon-remove"></i> Rechazar
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section><%
+                        break;
+                    case 2:
+                    %><section class="blog-post" id="<%= data[i].idpost%>">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="blog-post-meta">
+                                    <input class="hidden" value="<%= data[i].tagz%>" data-id="<%= data[i].idpost%>">
+                                    <p class="blog-post-date pull-right"><%= f_gen%></p>
+                                </div>
+                                <div class="blog-post-content">
+                                    <a href="/post/<%= data[i].idpost%>">
+                                        <h2 class="blog-post-title"><%= data[i].t_principal%></h2>
+                                    </a>
+                                    <p><%- data[i].contenido%></p>
+                                    <a class="blog-post-share pull-left" href="#">
+                                        Creado por: <%= data[i].username%>
+                                    </a>
+                                    <div class="blog-post-share pull-right">
+                                        <a class="comm btn btn-success" data-id="<%= data[i].idpost%>" style="display: inline-block">
+                                            <i class="glyphicon glyphicon-thumbs-up"></i> Aprobar
+                                        </a>
+                                        <a class="laik btn btn-danger" data-toggle="modal" data-target="#rm" data-id="<%= data[i].idpost%>" style="display: inline-block">
+                                            <i class="glyphicon glyphicon-remove"></i> Rechazar
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section><%
+
+                        break;
+                    case 3:
+                    %><section class="blog-post" id="<%= data[i].idpost%>">
+                        <div class="panel panel-default">
+                            <img src="<%= data[i].t_principal%>" width="auto" class="img-responsive">
+                            <div class="panel-body">
+                                <div class="blog-post-meta">
+                                    <input class="hidden" value="<%= data[i].tagz%>" data-id="<%= data[i].idpost%>">
+                                    <p class="blog-post-date pull-right"><%= f_gen%></p>
+                                </div>
+                                <div class="blog-post-content">
+                                    <p><%- data[i].contenido%></p>
+                                    <a class="blog-post-share pull-left" href="#">
+                                        Creado por: <%= data[i].username%>
+                                    </a>
+                                    <div class="blog-post-share pull-right">
+                                        <a class="comm btn btn-success" data-id="<%= data[i].idpost%>" style="display: inline-block">
+                                            <i class="glyphicon glyphicon-thumbs-up"></i> Aprobar
+                                        </a>
+                                        <a class="laik btn btn-danger" data-toggle="modal" data-target="#rm" data-id="<%= data[i].idpost%>" style="display: inline-block">
+                                            <i class="glyphicon glyphicon-remove"></i> Rechazar
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section><%
+                        break;
+                    case 4:
+                    %><section class="blog-post" id="<%= data[i].idpost%>">
+                        <div class="panel panel-default">
+                            <%- data[i].t_principal%>
+                            <div class="panel-body">
+                                <div class="blog-post-meta">
+                                    <input class="hidden" value="<%= data[i].tagz%>" data-id="<%= data[i].idpost%>">
+                                    <p class="blog-post-date pull-right"><%= f_gen%></p>
+                                </div>
+                                <div class="blog-post-content">
+                                    <p ><%- data[i].contenido%></p>
+                                    <a class="blog-post-share pull-left" href="#">
+                                        Creado por: <%= data[i].username%>
+                                    </a>
+                                    <div class="blog-post-share pull-right">
+                                        <a class="comm btn btn-success" data-id="<%= data[i].idpost%>" style="display: inline-block">
+                                            <i class="glyphicon glyphicon-thumbs-up"></i> Aprobar
+                                        </a>
+                                        <a class="laik btn btn-danger" data-toggle="modal" data-target="#rm" data-id="<%= data[i].idpost%>" style="display: inline-block">
+                                            <i class="glyphicon glyphicon-remove"></i> Rechazar
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <%
+                        break;
+                        default:
+                            status = "inactivo";
+                    }
+                    }
+                    } else {%>
+                    <p> No hay posts</p>
+                    <% } %>
+                </div>
+            </div>
+
+        </div><!-- /.blog-main -->
+
+    </div><!-- /.row -->
+
+</div><!-- /.container -->
+
+
+<%- include ../layouts/footer_x.ejs %>
+
+<button class="material-scrolltop primary" type="button"></button>
+
+<div class="modal fade" id="rm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h2 class="modal-title" id="myModalLabel">Notificación de rechazo</h2>
+            </div>
+            <div class="modal-body">
+                <form id="rjc_post">
+                    <select name="razon" class="form-control">
+                        <option value="Lenguaje Ofensivo">Lenguaje Ofensivo</option>
+                        <option value="Contenido Inapropiado">Contenido Inapropiado</option>
+                        <option value="Mal Elaborado">Mal elaborado</option>
+                    </select>
+                    <input type="textarea" row="3" class="form-control" style="resize: none" name="comment">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div class="form-group form-inline">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                        <button type="submit" id="send" name="idpost" data-dismiss="modal" value=""  class="btn btn-danger">Rechazar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<link href="/assets/css/jquery-te-1.4.0.css" rel="stylesheet">
+<script src="/assets/js/jquery-te-1.4.0.min.js"></script>
+<script src="/assets/js/ripples.min.js"></script>
+<script src="/assets/js/material.min.js"></script>
+<script src="/assets/js/material-scrolltop.js"></script>
+<script src="/assets/js/main.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $(".comm").click(function(e){
+            var idpost = "#" + $(this).data('id');
+            var data = {};
+            data.idpost = $(this).data('id');
+            $.ajax({
+                type: 'POST',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                url: '/approve',
+                success: function(data) {
+                    if(data == "si"){
+                        console.log("yquepasa");
+                        $(idpost).html("");
+                    } else {
+                        alert("Error en la aprovación");
+                    }
+                }
+            });
+
+        });
+        $(".laik").click(function(e){
+            $("#send").val($(this).data('id'));
+
+        });
+        $("#send").click(function(e){
+           e.preventDefault();
+            var idpost = "#" + $(this).val();
+            var data = {};
+            data.idpost = $(this).val();
+            data.razon = $("#rjc_post :selected").val();
+            data.comment = $("#rjc_post input").val();
+            $.ajax({
+                type: 'POST',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                url: '/rmm',
+                success: function(data) {
+                    if(data == "si"){
+                        $(idpost).html("");
+                    } else {
+                        alert("Error en la notificacion");
+                    }
+                }
+            });
+        });
+        $(".blog-post-meta :input.hidden").each(function (j) {
+            var tagger = $(this).val();
+            var idpost = "#" + $(this).data('id');
+            tagger = tagger.split(",");
+            for(var i = 0; i < tagger.length;i++){
+                if(tagger[i] != "null") {
+                    $(idpost+" .blog-post-meta").append('<span class="label label-light label-primary">' + tagger[i] + '</span> ');
+                } else $(idpost).append('<span class="label label-light label-primary">Sin Tags</span> ');
+
+            }
+        })
+
+    });
+</script>
+</body>
+</html>

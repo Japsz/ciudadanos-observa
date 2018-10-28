@@ -1,0 +1,103 @@
+<%- include ../../layouts/admin_header.ejs %>
+<h2 class="page-header">Observatorio: <%= obs.nom%> <a class="btn btn-info pull-right" href="/instit">Volver</a></h2>
+<div class="row">
+    <h2>Ciudadanos <a class="btn btn-info pull-right getcsv" data-tipo="cdd" data-id="<%= obs.idobservatorio%>" href="#"><i class="fa fa-download"></i> Generar csv</a></h2>
+    <form method="get" id="csvget">
+        <input type="hidden" name="">
+    </form>
+    <div class="table table-responsive">
+    <table class="table">
+        <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Nombre de Usuario</th>
+            <th>Correo</th>
+            <th>N° Posts</th>
+        </tr>
+        <tbody id="totales">
+    <%
+    if(users.length){
+        var status = 0;
+    for(var i = 0;i < users.length; i++){
+        status += users[i].posts;
+    %>
+    <tr id="<%=users[i].iduser%>">
+        <td><%= users[i].nombre%></td>
+        <td><%= users[i].apellido%></td>
+        <td><%= users[i].username%></td>
+        <td><%= users[i].correo%></td>
+        <td><%= users[i].posts%></td>
+        <td><a class="btn btn-danger" href="/user/delete/<%= users[i].iduser%>"><i class="fa fa-minus"></i> Quitar</a></td>
+    </tr>
+    <%
+    }
+    } else{%>
+    <tr><td>No se encontraron Ciudadanos</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+    <%
+    }
+    %>
+        <tr><th></th><th></th><th></th><th></th><th>Posts Totales: <%= status%></th></tr>
+        </tbody>
+    </table>
+    </div>
+</div>
+<div class="row">
+    <h2 class="page-header">Proyectos <a class="btn btn-info pull-right getcsv" data-tipo="proy" data-id="<%= obs.idobservatorio%>" href="#"><i class="fa fa-download"></i> Generar csv</a></h2>
+
+    <div class="table-responsive">
+        <table class="table">
+            <tr>
+                <th>Título</th>
+                <th>Descripción</th>
+                <th>Etapa</th>
+                <th>Evento</th>
+                <th>N° Integrantes</th>
+            </tr>
+            <tbody id="fila"><tr>
+                <%
+                if(proyects.length){
+                    var status;
+                for(var i = 0;i < proyects.length; i++){
+                %>
+            <tr id="<%= proyects[i].idproyecto%>">
+                <td><%= proyects[i].titulo%></td>
+                <td><%= proyects[i].descripcion%></td>
+                <td><%= proyects[i].etapa%></td>
+                <td><%= proyects[i].nombre%></td>
+                <td><%= proyects[i].ints%></td>
+            </tr>
+            <%
+            }
+            } else{%>
+            <tr><td>No se encontraron proyectos</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+            <%
+            }
+            %>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+    $(".getcsv").click(function(e){
+        var yo = $(this);
+        data = { idobs : $(this).data('id')};
+        $.ajax({
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            url: '/csv_' + $(this).data('tipo'),
+            success: function(data) {
+                yo.attr("href",data);
+                yo.attr("download","<%=obs.nom%>" + yo.data('tipo') + " hasta ~ " + new Date().toLocaleDateString() + ".csv");
+                yo.removeClass("btn-info");
+                yo.removeClass("getcsv");
+                yo.addClass("btn-success");
+                yo.html("<i class='fa fa-download'></i> Descargar csv");
+                console.log(data);
+            }
+        });
+
+    });
+</script>
+
+<%- include ../../layouts/footer.ejs %>

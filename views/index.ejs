@@ -1,0 +1,152 @@
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/assets/favicon.ico">
+
+    <title>Observa</title>
+
+    <!-- Loading animation -->
+    <script src="/assets/js/pace.min.js"></script>
+
+    <!-- Bootstrap core CSS and Material Bootstrap -->
+    <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/assets/css/bootstrap-material-design.css" rel="stylesheet">
+    <link href="/assets/css/ripples.min.css" rel="stylesheet">
+    <link href="/assets/css/material-scrolltop.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/assets/css/material-blog.css" rel="stylesheet">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="/assets/js/jquery-1.11.3.min.js"></script>
+    <script src="/assets/js/bootstrap.min.js"></script>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+<div class="navbar navbar-material-blog navbar-primary navbar-fixed-top">
+
+    <div class="navbar-image" style="background-image: url('/assets/img/unsplash-7.jpg');background-position: center 39%;height: 115%"></div>
+
+    <div class="navbar-wrapper container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <div class="navbar-collapse collapse navbar-responsive-collapse">
+            <a href="/"><img class="navbar-brand material-icons" src="/assets/img/iso_iso.png"></a>
+            <ul class="nav navbar-nav">
+                <li class="active dropdown">
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="container blog-content">
+
+    <div class="row">
+
+        <div class="col-sm-12 blog-main">
+
+                    <section class="blog-post">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="blog-post-meta">
+                                    <h1 class="blog-post-title">Iniciar Sesión</h1>
+                                </div>
+                                <div class="blog-post-content form-group">
+                                    <form action="/user_login_handler" method="POST">
+                                        <label for="userame"> Usuario o Correo</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                            <input type="text" class="form-control" name="username" required>
+                                        </div>
+                                        <label for="pass">Contraseña</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-key"></i></span>
+                                            <input type="password" class="form-control" name="password" required>
+                                            <a href="#passrecover" data-toggle="modal" class="pull-right">¿Olvidaste tu contraseña?</a>
+                                        </div>
+                                        <div class="form-group form-inline pull-right">
+                                            <button type="submit" class="form-control btn btn-primary">Entrar</button>
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+        </div><!-- /.blog-main -->
+    </div><!-- /.row -->
+
+</div><!-- /.container -->
+
+
+<%- include layouts/footer_x.ejs %>
+
+<div class="modal fade" id="passrecover" tabindex="-1" role="dialog" >
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Recuperar Contraseña</h4>
+            </div>
+            <div class="modal-body">
+                <p>Ingresa aquí tu correo y te enviaremos un link para reestablecer tu contraseña.</p>
+                <input type="email" name="query" placeholder="algun@correo.cl" id="recover_q" class="form-control" require>
+            </div>
+            <div class="modal-footer">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button class="btn btn-primary" onclick="send_mail()">Enviar Correo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<button class="material-scrolltop primary" type="button"></button>
+<script src="/assets/js/ripples.min.js"></script>
+<script src="/assets/js/material.min.js"></script>
+<script src="/assets/js/material-scrolltop.js"></script>
+<script src="/assets/js/main.js"></script>
+<script type="text/javascript">
+    $.material.init();
+    $('body').materialScrollTop();
+    function send_mail(){
+        var value = $("#recover_q").val();
+        if(value != ""){
+            $.ajax({
+                type: 'GET',
+                url: '/send_recovery_mail/' + value,
+                success: function(data) {
+                    if(!data.error){
+                        alert("¡El correo se envió exitosamente!");
+                        $("#passrecover").modal('toggle');
+                    } else {
+                        alert(data.str);
+                    }
+                }
+            });
+        }
+    }
+</script>
+</body>
+</html>

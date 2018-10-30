@@ -178,7 +178,6 @@ app.use(function(err, req, res, next) {
 
 
 // file ajax
-
 app.post('/subir_pic', function (req,res) {
     var formidable = require('formidable');
     var fs = require('fs');
@@ -201,7 +200,17 @@ app.post('/subir_pic', function (req,res) {
 
     });
 });
-
+// stats ajax
+app.get('/get_stats',function(req,res){
+    req.getConnection(function(err,connection){
+        if(err) throw err;
+        connection.query("SELECT * FROM instituciones",function(err,rows){
+            if(err) throw err;
+            res.send({intituciones:rows});
+            //el ajax de la vista recibirá el objeto de arriba. después pueden sonceguir los datos de manera "datos.instituciones"
+        })
+    });
+});
 
 var server  = http.createServer(app);
 

@@ -411,7 +411,15 @@
              error  : function() { console.log('error');}
              });*/
         });
-
+        //ajax para crear estadísticas
+        $.ajax({
+           url: "/get_stats",
+           type: "get",
+           success: function(datos){
+               console.log(datos);
+               //conectar "datos" con la creación de el gráfico
+           }
+        });
     });
 
     function upload(e){

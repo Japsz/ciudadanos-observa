@@ -11,6 +11,14 @@
     <div class="sidebar-module">
         <div class="panel panel-default">
             <div class="panel-body">
+                <canvas id="myChart" width="250" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar-module">
+        <div class="panel panel-default">
+            <div class="panel-body">
                 <h4>Categorías</h4>
                 <div class="categories">
                     <a class="label label-light label-primary margen" href="/tagbsq/71">Agua limpia y saneamiento</a>
@@ -411,15 +419,35 @@
              error  : function() { console.log('error');}
              });*/
         });
-        //ajax para crear estadísticas
-        $.ajax({
-           url: "/get_stats",
-           type: "get",
-           success: function(datos){
-               console.log(datos);
-               //conectar "datos" con la creación de el gráfico
-           }
-        });
+
+
+
+            //ajax para crear estadísticas
+            $.ajax({
+                //conectar "datos" con la creación de el gráfico
+                type: 'GET',
+                url: "/get_stats",
+                success: function(data){
+                    var ctx = document.getElementById('myChart').getContext('2d');
+                    var chart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: ["Estudiantes", "Colegios", "Post", "Comentarios"],
+                            datasets: [{
+                                label: "Participacion",
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)'
+                                ],
+                                borderColor: 'rgb(150, 150, 150)',
+                                data: [data[0], data[1], data[2], data[3]]
+                            }]
+                        },
+                        options: {}
+                    });
+                }
+            });
     });
 
     function upload(e){
@@ -452,6 +480,8 @@
         }
 
     }
+
+    
 </script>
 
 </body>

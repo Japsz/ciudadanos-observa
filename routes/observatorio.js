@@ -1,3 +1,5 @@
+var send = require('../routes/sendmails'); //Importar la funcion para enviar mail
+
 //Vista agregar inst.
 exports.add_inst = function(req, res){
     if(req.session.isAdminLogged){
@@ -172,28 +174,57 @@ exports.obs_save = function(req,res){
 exports.obs_archive = function(req, res){
     if(req.session.isAdminLogged){
         req.getConnection(function(err,connection){
-            connection.query('DELETE FROM monitor WHERE idobservatorio = ?',req.params.id,function(err,rows)
+            connection.query('DELETE FROM monitor WHERE idobservatorio = ?',req.params.id, function(err,rows)
             {
                 if(err)
                     console.log("Error Deleting : %s ",err );
 
                 connection.query('UPDATE user SET tipo = 4 WHERE iduser IN (SELECT iduser FROM ciudadano WHERE idobs = ?)',req.params.id,function(err,insts)
                 {
-                    if(err)
-                        console.log("Error Updating : %s ",err );
-                    // Enviar correo a TODOS los usuarios modificados en la query anterior (DESACTIVACIÓN
-                    connection.query('UPDATE observatorio SET estado = 3 WHERE idobservatorio = ?',req.params.id,function(err,insts)
-                    {
-                        if(err)
-                            console.log("Error Selecting : %s ",err );
-                        connection.query('DELETE FROM ciudadano WHERE idobs = ?',req.params.id,function(err,insts)
+                    if(err){ console.log("Error Updating : %s ",err );
+                    } else {
+                        connection.query('UPDATE observatorio SET estado = 3 WHERE idobservatorio = ?', req.params.id, function(err,insts)
                         {
-                            if(err)
-                                console.log("Error Selecting : %s ",err );
-
-                            res.redirect("/instit");
+                            if(err) {console.log("Error Updating : %s ",err );
+                            } else {
+                                // Enviar correo a TODOS los usuarios modificados en la query anterior (DESACTIVACIÓN)
+                                connection.query("SELECT observatorio.idobservatorio, observatorio.nom, user.iduser, user.nombre, user.correo " + 
+                                    "FROM observatorio JOIN ciudadano ON ciudadano.idobs = observatorio.idobservatorio " +
+                                    "JOIN user ON ciudadano.iduser = user.iduser " + 
+                                    "WHERE idobservatorio=?", req.params.id, function(err, rows)
+                                {
+                                    if(err) {console.log("Error selecting mails: %s",err);
+                                    } else {
+                                        //Variables para envio de correo, data_mail debe tener las mismas variables
+                                        var obs = new Array(rows[0].nom, rows[0].idobservatorio); //Envia el nombre del obs y su id para la url
+                                        var mails = new Array(); //Debe ser array!
+                                        for(i = 0; i < rows.length ;i++) {
+                                            if(rows[i].correo != null) {
+                                                mails.push(rows[i].correo);
+                                            }
+                                        }
+                                        var subj = "Aviso sobre tu observatorio " + rows[0].nom;
+                                        var data_mail = {
+                                            view: "views\\admin\\obs\\obs_archive.ejs", //Path
+                                            subject: subj, //Asunto del mensaje
+                                            inf: obs, //Array con informacion de observatorio
+                                            mails: mails}; //Array de los correos
+                                        connection.query('DELETE FROM ciudadano WHERE idobs = ?', req.params.id, function(err,insts)
+                                        {
+                                            if(err) {console.log("Error Deleting : %s ",err );
+                                            } else {
+                                                send.send_mail(data_mail,function(err) {
+                                                    if(err){ console.log(err.message);}
+                                                });
+                                                console.log("Se desvinculo a " + mails + " de observatorio " + req.params.id + ", mail enviado correctamente.");
+                                                res.redirect("/instit");
+                                            }
+                                        });
+                                    }
+                                });
+                            }
                         });
-                    });
+                    }
                 });
 
             });

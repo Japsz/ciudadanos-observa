@@ -1,3 +1,5 @@
+var send = require('../routes/sendmails'); //Importar la funcion para enviar mail
+
 // Logica agregar cdd a obs.
 exports.save_cdd = function(req,res){
     if(req.session.isUserLogged && req.session.user.tipo == 1){
@@ -23,7 +25,6 @@ exports.save_cdd = function(req,res){
                     // Si existe, vincularlo al observatorio
                     connection.query("INSERT INTO ciudadano SET ?",{idobs : input.idobs, iduser : rows[0].iduser}, function(err, rows)
                     {
-
                         if (err){
                             console.log("Error inserting : %s ",err );
                             res.redirect('/obs_usr/' + input.idobs);
@@ -32,9 +33,29 @@ exports.save_cdd = function(req,res){
                             connection.query("UPDATE user SET tipo = 3 WHERE correo = ?",input.correo, function(err, rows)
                             {
                                 if (err) console.log("Error Inserting cdd : %s ", err);
-
-                                    // ACÁ FALTA MAIL DE REACTIVACIÓN DE USUARIO
-                                    res.redirect('/obs_usr/' + input.idobs);
+                                    // Reactivacion de usuario y Envio de mail
+                                    connection.query("SELECT nom FROM observatorio WHERE idobservatorio=?", input.idobs,function(err, rows)
+                                    {
+                                        if(err) {console.log("Error Selecting observatorio: %s",err);
+                                        } else {
+                                            //Variables para envio de correo, data_mail debe tener las mismas variables
+                                            var obs = new Array(rows[0].nom, input.idobs); //Envia el nombre del obs y su id para la url
+                                            var mails = new Array(input.correo); //Debe ser array!
+                                            var subj = "Bienvenido a observatorio " + rows[0].nom;
+                                            var data_mail = {
+                                                view: "views\\monitor\\save_cdd.ejs", //Path
+                                                subject: subj, //Asunto del mensaje
+                                                inf: obs, //Array con informacion de observatorio
+                                                mails: mails}; //Array de los correos
+                                            send.send_mail(data_mail,function(err) {
+                                                if(err){
+                                                    console.log(err.message);
+                                                }
+                                            });
+                                            console.log("Se vinculo a " + input.correo + " a observatorio " + input.idobs + ", mail enviado correctamente.");
+                                            res.redirect('/obs_usr/' + input.idobs);
+                                        }
+                                    });
                             });
                         }
                     });
@@ -70,7 +91,7 @@ exports.save_cdd = function(req,res){
                         }
                     });
                 }
-            })
+            });
 
 
             // console.log(query.sql); get raw query

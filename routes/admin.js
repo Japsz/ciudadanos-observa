@@ -1,3 +1,5 @@
+var send = require('../routes/sendmails'); //Importar la funcion para enviar mail
+
 //Vista lista de usuarios.
 exports.list = function(req, res){
 	if(req.session.isAdminLogged){
@@ -324,26 +326,50 @@ exports.g_csv_proy = function(req,res){
 };
 //Desvincular Ciudadano de Observatorio.
 exports.delete_user = function(req,res){
-
 	if(req.session.isAdminLogged){
-
-		 req.getConnection(function (err, connection) {
-				
-				connection.query("DELETE FROM ciudadano WHERE iduser = ? ",[req.params.iduser], function(err, rows)
-                {
-						 if(err)
-								 console.log("Error deleting : %s ",err );
-						 connection.query("UPDATE user SET tipo = 4 WHERE iduser = ?",[req.params.iduser],function(err,rows){
-                            if(err)
-                                 console.log("Error deleting : %s ",err );
-                            // Acá falta el mail de DESACTIVACIÓN de usuario
-                            res.redirect(req.header("Referer") || '/');
-                         });
-						
-
-				});
-				
-		 });
-		}
-		else res.redirect('/bad_login');
+        req.getConnection(function (err, connection) {
+			connection.query("UPDATE user SET tipo = 4 WHERE iduser = ?",[req.params.iduser],function(err,rows)
+            {
+                if(err) {console.log("Error deleting : %s ",err );
+                } else {
+                    connection.query("SELECT observatorio.idobservatorio, observatorio.nom, user.iduser, user.nombre, user.correo FROM user " + 
+                        "JOIN ciudadano ON ciudadano.iduser = user.iduser JOIN observatorio ON ciudadano.idobs = observatorio.idobservatorio " +
+                        "WHERE user.iduser=?", req.params.iduser, function(err, rows)
+                    {
+                        if(err) {console.log("Error selecting mails: %s",err);
+                        } else {
+                            // Mail de DESACTIVACIÓN de usuario
+                            var obs = new Array(rows[0].nom, rows[0].idobservatorio); //Envia el nombre del obs y su id para la url
+                            var mails = new Array(); //Debe ser array!
+                            for(i = 0; i < rows.length ;i++) {
+                                if(rows[i].correo != null) {
+                                    mails.push(rows[i].correo);
+                                }
+                            }
+                            var subj = "Aviso sobre tu observatorio " + rows[0].nom;
+                            var data_mail = {
+                                view: "views\\admin\\obs\\obs_archive.ejs", //Path
+                                subject: subj, //Asunto del mensaje
+                                inf: obs, //Array con informacion de observatorio
+                                mails: mails}; //Array de los correos
+                            //Delete va aqui porque asi encuentra el observatorio por el iduser
+                            connection.query("DELETE FROM ciudadano WHERE iduser = ? ",[req.params.iduser], function(err, rows)
+                            {
+                                if(err) {console.log("Error deleting : %s ",err );
+                                } else{ 
+                                    send.send_mail(data_mail,function(err) {
+                                        if(err){ console.log(err.message);}
+                                    });
+                                    console.log("Se desvinculo a " + mails + " de observatorio " + req.params.id + ", mail enviado correctamente.");
+                                    res.redirect(req.header("Referer") || '/');
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+		});
+    } else {
+        res.redirect('/bad_login');
+    }
 };

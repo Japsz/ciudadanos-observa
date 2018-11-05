@@ -3,7 +3,6 @@ var routes = require('./routes/index');
 var http = require('http');
 var path = require('path');
 
-
 var app = express(), mailer = require("express-mailer");
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
@@ -55,9 +54,9 @@ app.use(
 
         host: '127.0.0.1',
         user: 'root',
-        password : '1234',
+        password : '',
         port : 3306,
-        database:'Observapp'
+        database:'observapp'
 
     },'pool')
 
@@ -157,6 +156,52 @@ app.get('/bad_login', users.bad_login);
 app.post('/admin_login_handler', users.admin_login_handler);
 app.post('/user_login_handler', users.user_login_handler);
 
+// stats ajax
+app.get('/get_stats', function(req,res){
+    req.getConnection(function(err,connection){
+        connection.query("SELECT COUNT(*) AS user_count FROM user WHERE tipo = 3", function(err,user_count){
+            if(err) throw err;
+            connection.query("SELECT COUNT(*) AS institucion_count FROM institucion",function(err,institucion_count){
+                if(err) throw err;
+                connection.query("SELECT COUNT(*) AS comentarios_count FROM comentario",function(err,comentarios_count){
+                    if(err) throw err;
+                    connection.query("SELECT COUNT(*) AS post_count FROM post",function(err,post_count){
+                        if(err) throw err;
+                        connection.query("SELECT COUNT(*) FROM post", function(err, inst3){
+                            if(err) throw err;
+                            var datas = [
+                                user_count[0]["user_count"],
+                                institucion_count[0]["institucion_count"],
+                                comentarios_count[0]["comentarios_count"],
+                                post_count[0]["post_count"]
+                                ]
+                            console.log(user_count);
+                            res.send(datas);
+                        });
+                    });
+                });
+            });
+        });
+    });
+});
+        // console.log("No entiendo mucho que pasa.");
+        // if(err) throw err;
+        // connection.query("SELECT COUNT (*) FROM user WHERE tipo = 3",function(err,rows){
+        //     if(err) throw err;
+        //     connection.query("SELECT COUNT (*) FROM instituciones",function(err,rows){
+        //         if(err) throw err;
+        //         connection.query("SELECT * FROM instituciones",function(err,rows){
+        //             if(err) throw err;
+
+        //             connection.query("SELECT * FROM instituciones",function(err,rows){
+        //                 if(err) throw err;
+
+        //                 res.send('HELLO');
+        //             });
+        //         });
+        //     });
+        // });
+    
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
@@ -198,17 +243,6 @@ app.post('/subir_pic', function (req,res) {
             res.send("/web-img/" + f_gen);
         });
 
-    });
-});
-// stats ajax
-app.get('/get_stats',function(req,res){
-    req.getConnection(function(err,connection){
-        if(err) throw err;
-        connection.query("SELECT * FROM instituciones",function(err,rows){
-            if(err) throw err;
-            res.send({intituciones:rows});
-            //el ajax de la vista recibirá el objeto de arriba. después pueden sonceguir los datos de manera "datos.instituciones"
-        })
     });
 });
 

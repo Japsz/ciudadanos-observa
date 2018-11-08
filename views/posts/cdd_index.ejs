@@ -82,7 +82,7 @@
                                 <div class="blog-post-share pull-right">
                                     <input type="hidden" class="laiktoken" value="<%=data[i].laiktoken%>" data-id="<%= data[i].idpost%>">
                                     <a class="comm btn btn-info" data-id="<%= data[i].idpost%>">
-                                        <i class="glyphicon glyphicon-comment"></i> Ver Comentarios
+                                        <i class="glyphicon glyphicon-comment"></i> <%= data[i].c_count%>
                                     </a>
                                     <a class="laik btn btn-inverse" data-id="<%= data[i].idpost%>" href="#">
                                         <i class="glyphicon glyphicon-thumbs-up"></i> <%= data[i].likes%>
@@ -101,8 +101,11 @@
                 <script type="text/javascript">
                     var loading = false;
                     var fin = <% if(data.length < 6){%>true<%} else {%>false<%}%>;
+                    //Cuando se hace Scroll
                     $(window).scroll(function() {
+
                         console.log(loading);
+                        //La distancia hasta arriba + largo de la pantalla es mayor a el largo del documento - 100
                         if($(window).scrollTop() + $(window).height() > $(document).height() - 100 && !loading && !fin)  {
                             loading = true;
                             $("#loader").removeClass("hidden");

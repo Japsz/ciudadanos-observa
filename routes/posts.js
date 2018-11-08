@@ -5,9 +5,9 @@ exports.indx = function(req, res){
     if(req.session.isUserLogged){
         req.getConnection(function(err,connection){
 
-            connection.query('SELECT post.*,user.username,user.avatar_pat AS iconouser,GROUP_CONCAT(DISTINCT tags.tag,"@", tags.idtag ORDER BY tags.tag) AS tagz, COUNT(DISTINCT megusta.iduser) as likes, GROUP_CONCAT(DISTINCT megusta.iduser) as laiktoken FROM' +
+            connection.query('SELECT COUNT(DISTINCT comentario.idcomentario) as c_count,post.*,user.username,COALESCE(user.avatar_pat,"/assets/img/placeholder.png") AS iconouser,GROUP_CONCAT(DISTINCT tags.tag,"@", tags.idtag ORDER BY tags.tag) AS tagz, COUNT(DISTINCT megusta.iduser) as likes, GROUP_CONCAT(DISTINCT megusta.iduser) as laiktoken FROM' +
                 ' post LEFT JOIN tagpost ON post.idpost = tagpost.idpost LEFT JOIN tags ON tagpost.idtag = tags.idtag INNER JOIN user ON user.iduser = post.iduser' +
-                ' LEFT JOIN megusta ON megusta.idpost = post.idpost WHERE post.estado = 2 GROUP BY post.idpost ORDER BY post.fecha DESC LIMIT 6',function(err,rows)
+                ' LEFT JOIN megusta ON megusta.idpost = post.idpost LEFT JOIN comentario ON comentario.idpost = post.idpost WHERE post.estado = 2 GROUP BY post.idpost ORDER BY post.fecha DESC LIMIT 6',function(err,rows)
             {
                 if(err)
                     console.log("Error Selecting : %s ",err );
@@ -24,9 +24,9 @@ exports.indx_stream = function(req, res){
         var input = JSON.parse(JSON.stringify(req.body));
         var wher;
         var render = "posts/";
-        var query = 'SELECT post.*, GROUP_CONCAT(DISTINCT megusta.iduser) as laiktoken,user.avatar_pat AS iconouser,user.username,' +
-            'GROUP_CONCAT(DISTINCT tags.tag,"@", tags.idtag ORDER BY tags.tag) AS tagz, COUNT(DISTINCT megusta.iduser) as likes FROM' +
-            ' post LEFT JOIN tagpost ON post.idpost = tagpost.idpost LEFT JOIN tags ON tagpost.idtag = tags.idtag INNER JOIN user ON user.iduser = post.iduser' +
+        var query = 'SELECT post.*, GROUP_CONCAT(DISTINCT megusta.iduser) as laiktoken,COALESCE(user.avatar_pat,"/assets/img/placeholder.png") AS iconouser,user.username,' +
+            'GROUP_CONCAT(DISTINCT tags.tag,"@", tags.idtag ORDER BY tags.tag) AS tagz, COUNT(DISTINCT megusta.iduser) as likes,  COUNT(DISTINCT comentario.idcomentario) as c_count FROM' +
+            ' post LEFT JOIN tagpost ON post.idpost = tagpost.idpost LEFT JOIN comentario ON comentario.idpost = post.idpost LEFT JOIN tags ON tagpost.idtag = tags.idtag INNER JOIN user ON user.iduser = post.iduser' +
             ' LEFT JOIN megusta ON megusta.idpost = post.idpost WHERE post.fecha < ? ';
         switch(input.strim){
             case "indx":
@@ -108,7 +108,7 @@ exports.getcomments = function(req, res){
     if(req.session.isUserLogged){
         req.getConnection(function(err,connection){
 
-            connection.query('SELECT comentario.*,user.username,user.avatar_pat FROM comentario INNER JOIN user ON user.iduser = comentario.iduser' +
+            connection.query('SELECT comentario.*,user.username,COALESCE(user.avatar_pat,"/assets/img/placeholder.png") as avatar_pat FROM comentario INNER JOIN user ON user.iduser = comentario.iduser' +
                 ' WHERE comentario.idpost  = ? GROUP BY comentario.idcomentario',input.idpost,function(err,rows)
             {
                 if(err)

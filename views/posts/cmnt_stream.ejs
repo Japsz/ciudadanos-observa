@@ -4,7 +4,7 @@ key = key.replace(/\:|\ |\/|\,/gm,"")%>
 <h2 class="blog-post-title">Comentarios</h2>
     <form id="cmntform">
         <div class="well" style="display: flex;margin:auto;height:150px">
-            <img class="img-responsive img-circle pull-left" style="margin-top: 0;display: block" width="60px" height="auto" src="<%= usr.avatar_pat%>">
+            <img class="img-responsive img-circle pull-left" style="margin-top: 0;display: block; width:60px; height:60px"  src="<%= usr.avatar_pat%>">
             <textarea class="form-control" placeholder="Introduce tu comentario aquí" name="texto" type="text" id="commtxt" style="margin-left: 10px; height:auto"></textarea>
             <button class="btn btn-primary send_comm" type="submit" name="idpost" style="height: auto" value="<%= data%>">Enviar</button>
         </div>
@@ -19,7 +19,7 @@ key = key.replace(/\:|\ |\/|\,/gm,"")%>
     <div class="well" style="display: flex;margin:auto;height:auto">
 
         <div style="width: 20%;display: table;margin: 5px">
-            <img class="img-circle img-responsive" style="display:block" width="60px" height="auto" src="<%= comments[i].avatar_pat%>">
+            <img class="img-circle img-responsive" style="display:block; width:60px; height:60px" src="<%= comments[i].avatar_pat%>">
             <p style="margin-top: 5px;font-size: larger;text-align: center"><b><%= comments[i].username%></b></p>
         </div>
         <p style="margin-left: 10px ;margin-top: 40px;font-size: large;text-align: left;width:65%"><%= comments[i].texto%></p>

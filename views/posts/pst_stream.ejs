@@ -45,7 +45,7 @@ for(var i = 0;i<data.length;i++){
                 <div class="blog-post-share pull-right">
                     <input type="hidden" class="laiktoken" value="<%=data[i].laiktoken%>" data-id="<%= data[i].idpost%>">
                     <a class="stream_comm btn btn-info" data-id="<%= data[i].idpost%>">
-                        <i class="glyphicon glyphicon-comment"></i> Ver Comentarios
+                        <i class="glyphicon glyphicon-comment"></i> <%= data[i].c_count%>
                     </a>
                     <a class="loik btn btn-inverse" onclick="laik(this)" data-id="<%= data[i].idpost%>">
                         <i class="glyphicon glyphicon-thumbs-up"></i> <%= data[i].likes%>

@@ -128,8 +128,17 @@ exports.get_obs = function(req, res){
 };
 exports.obs_monit = function(req, res){
     if(req.session.isUserLogged && req.session.user.tipo == 1){
+        req.getConnection(function(err,connection){
+            if(err) console.log(err);
+           connection.query("SELECT observatorio.* FROM observatorio LEFT JOIN monitor" +
+               " ON monitor.idobservatorio = observatorio.idobservatorio WHERE idmonitor = ?",req.session.user.iduser,function(err,obs){
+              if(err) console.log(err);
+              req.session.idobs = obs;
+              res.render('monitor/monit_obs',{page_title:"Observatorios",data:obs,usr:req.session.user, obs: obs});
 
-            res.render('monitor/monit_obs',{page_title:"Observatorios",data:req.session.idobs,usr:req.session.user, obs: req.session.idobs});
+           });
+        });
+
     }
     else res.redirect('/bad_login');
 };

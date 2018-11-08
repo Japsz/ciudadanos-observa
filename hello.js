@@ -203,26 +203,6 @@ app.get('/get_stats', function(req,res){
         // });
     
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    console.log("?");
-    next(err);
-});
-
-// error handler
-app.use(function(err, req, res, next) {
-    // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-    // render the error page
-    res.status(err.status || 500);
-    res.render('bad_login');
-});
-
-
-// file ajax
 app.post('/subir_pic', function (req,res) {
     var formidable = require('formidable');
     var fs = require('fs');
@@ -244,6 +224,23 @@ app.post('/subir_pic', function (req,res) {
         });
 
     });
+});
+
+app.use(function(req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
+
+// error handler
+app.use(function(err, req, res, next) {
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+    // render the error page
+    res.status(err.status || 500);
+    res.render('bad_login');
 });
 
 var server  = http.createServer(app);

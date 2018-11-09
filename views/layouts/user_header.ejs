@@ -82,9 +82,17 @@
         <div class="navbar-collapse collapse navbar-responsive-collapse">
             <a href="/"><img class="navbar-brand material-icons" src="/assets/img/iso_iso.png"></a>
             <ul class="nav navbar-nav" style="margin-top: auto">
-                <li class="active dropdown">
                 <li class="dropdown">
                     <a href="/indx" >Inicio</a>
+                </li>
+                <li class="dropdown">
+                    <a data-target="#" class="dropdown-toggle" data-toggle="dropdown">Postear <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" data-toggle="modal" data-target="#aa" data-tipo="1" class="poster">Idea</a></li>
+                        <li><a href="#" data-toggle="modal" data-target="#aa" data-tipo="2" class="poster">Escrito</a></li>
+                        <li><a href="#" data-toggle="modal" data-target="#aa" data-tipo="3" class="poster">Imagen</a></li>
+                        <li><a href="#" data-toggle="modal" data-target="#aa" data-tipo="4" class="poster">Video</a></li>
+                    </ul>
                 </li>
                 <% if(usr.tipo == 1){%>
                 <li>

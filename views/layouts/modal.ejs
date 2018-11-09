@@ -1,0 +1,210 @@
+<!-- Modal Para realizar un post -->
+<div class="modal fade" id="aa" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h2 class="modal-title" id="myModalLabel">Crear Post</h2>
+            </div>
+            <form id="mform">
+                <div class="modal-body">
+                    <div id="preview"></div>
+                    <div class="form-group">
+                        <%  if(usr.tipo == 1){ %>
+                        <select name="idobserva" class="form-control">
+                            <option value="" disabled selected>Seleccione un observatorio</option>
+                            <%
+                            for(var j = 0; j<obs.length;j++){
+                            %>
+                            <option value="<%= obs[j].idobservatorio%>"><%= obs[j].nom%></option>
+                            <%
+
+                            }%>
+                            <option value="no">Sin observatorio</option>
+                        </select>
+                        <%
+                        } else if(usr.tipo == 3){%>
+                        <input name="idobserva" type="hidden" value="<%= obs[0].idobservatorio%>">
+                        <%}%>
+
+                        <input type="text" name="tit" id="t_princ" class="form-control" placeholder="" required>
+                        <div class="input-group hidden" id="fail">
+                            <input type="file" name="filetoupload" onchange="upload(this)">
+                            <a class="input-group-btn btn btn-success">Sube una foto <i class="glyphicon glyphicon-upload"></i></a>
+                        </div>
+                        <select id="catego" class="form-control hidden" name="cat">
+                            <option value="" disabled selected>Selecciona una categoría </option>
+                            <option value="18">Fin de la Pobreza</option>
+                            <option value="78">Acción por el Clima</option>
+                            <option value="71">Agua limpia y saneamiento</option>
+                            <option value="82">Alianzas para lograr Objetivos</option>
+                            <option value="76">Ciudades y comunidades Sostenibles</option>
+                            <option value="69">Educación de Calidad</option>
+                            <option value="72">Energía asequible y no contaminante</option>
+                            <option value="67">Hambre Cero</option>
+                            <option value="70">Igualdad de Género</option>
+                            <option value="74">Industria Innovación e infraestructura</option>
+                            <option value="81">Paz justicia e Instituciones solidas</option>
+                            <option value="77">Producción y consumo responsable</option>
+                            <option value="75">Reducción de Desigualdades</option>
+                            <option value="68">Salud y Bienestar</option>
+                            <option value="73">Trabajo Decente y crecimiento económico</option>
+                            <option value="80">Vida de Ecosistemas terrestres</option>
+                            <option value="79">Vida submarina</option>
+                        </select>
+                        <textarea type="text" name="texto" class="hidden" id="editor"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden"  id="tipo" name="tipo" value="">
+                    <div class="form-group form-inline">
+                        <input type='text' class='form-control' name='tags' id="tag" value="" placeholder="tags (Ej: tag1, tag2, tag3)">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary mform">+ Post</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal para confirmar eliminación de un post -->
+<div class="modal fade" id="rm_pst" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h2 class="modal-title" id="myModalLabel">Eliminar Post</h2>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro que quieres borrar este post?</p>
+            </div>
+            <div class="modal-footer">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                    <a class="btn btn-danger" id="rm_real">Si, Eliminar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal para información ¿Qué es observaciudadanía?-->
+<div class="modal fade" id="tutorial1" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h2 class="modal-title" id="myModalLabel">¡Bienvenido/a!</h2>
+            </div>
+            <div class="modal-body">
+                <p>La plataforma ObservaCiudadanía es el espacio de encuentro virtual entre las y los
+                    participantes de los talleres de ObservaCiudadanía. En este espacio podrás compartir ideas y
+                    contenidos con tu curso y los otros cursos de otros colegios que son parte de la Red
+                    ObservaCiudadanía.</p>
+            </div>
+            <div class="modal-footer">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <!-- <button type="button" class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#tutorial2">¿Cómo Funciona?</button> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal para información ¿Qué es observaciudadanía?-->
+<div class="modal fade" id="tutorial2" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h2 class="modal-title" id="myModalLabel">Eliminar Post</h2>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro que quieres borrar este post?</p>
+            </div>
+            <div class="modal-footer">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal para información 'Preguntas Frecuentes'-->
+<div class="modal fade" id="tutorial3" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h2 class="modal-title" id="myModalLabel">Preguntas Frecuentes</h2>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>
+                        <a href="#pf1" data-toggle="collapse">¿Qué es ObservaCiudadanía?</a>
+                        <div class="collapse" id="pf1">
+                            <p style="padding: 5px">Observaciudadanía es una ONG (organización no gubernamental) que trabaja en la formación
+                                ciudadana de jóvenes. </p>
+                            <p style="padding: 5px">
+                                Hoy desarrolla su trabajo por medio de 4 herramientas: Talleres de formación ciudadana y
+                                liderazgo estudiantil, Cumbres de innovación Ciudadana, Capacitaciones a docentes y directivos y
+                                diseño y aplicación de diagnóstico.</p>
+                            <p style="padding: 5px">Para más información visita <a href="http://www.observaciudadania.org" target="_blank">www.observaciudadania.org</a></p>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#pf2" data-toggle="collapse">¿Cómo puedo cambiar mi contraseña?</a>
+                        <div class="collapse" id="pf2">
+                            <p style="padding: 5px">Al ingresar al login de <a href="https://app.observaciudadania.org" target="_blank">app.observaciudadania.cl</a>, verás un botón que dice “olvidaste tu contraseña?
+                                Presiónalo y te pedirá un mail de confirmación para modificar tu contraseña.</p>
+                            <p style="padding: 5px"> Con eso podrás ingresar nuevamente.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#pf3" data-toggle="collapse">¿Cómo elimino un post?</a>
+                        <div class="collapse" id="pf3">
+                            <p style="padding: 5px">
+                                En la barra superior izquierda de la plataforma, haz click en la pestaña
+                                “<a href="/usr_post">Mis Post</a>” y podrás ver todos los post que has hecho. Busca el que quieres
+                                eliminar y haz click en el botón "<button class="btn btn-danger"><i class="fa fa-remove"></i></button>" que aparece al costado inferior derecho.
+                            </p>
+                            <p style="padding: 5px">Al eliminar un post, no podrás deshacer la eliminación. Pero sí puedes volver a publicar otro
+                                nuevo.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#pf4" data-toggle="collapse">¿Cómo cambio mi perfil?</a>
+                        <div class="collapse" id="pf4">
+                            <p style="padding: 5px">
+                                En la barra superior derecha encontrarás tu nombre y tu imagen, haz click en tu nombre y
+                                aparecerá tu perfil completo.
+                            </p>
+                            <p style="padding: 5px">
+                                En tu perfil encontrarás un botón que dice “<a href="/cdd_cedit">editar perfil</a>”.
+                            </p>
+                            <p style="padding: 5px"></p>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#pf5" data-toggle="collapse">¿Cómo pido ayuda?</a>
+                        <div class="collapse" id="pf5">
+                            <p style="padding: 5px">
+                                Si tienes dudas, ¡escríbenos!.
+                            </p>
+                            <p style="padding:5px;">
+                                Heredi Hervia es nuestra coordinadora de desarrollo y su mail es
+                                desarrollo@observaciudadania.org
+                            </p>
+                        </div>
+                    </li>
+                </ul>
+
+            <div class="modal-footer">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

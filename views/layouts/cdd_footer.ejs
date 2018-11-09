@@ -7,19 +7,22 @@
             </div>
         </form>
     </div><!-- /.sidebar-module -->
-
+    <!-- Botones de Ayuda -->
     <div class="sidebar-module">
         <div class="panel panel-default">
+            <div class="panel-heading">Ayuda</div>
             <div class="panel-body">
-                <canvas id="myChart" width="250" height="300"></canvas>
+                <a href="#tutorial1" data-toggle="modal"><img src="/assets/img/tutoriales/que_es.png" alt="Que es" width="100%"></a>
+                <!--<a href="#tutorial2" data-toggle="modal"><img src="/assets/img/tutoriales/como_func.png" alt="Como Funciona" width="100%"></a>-->
+                <a href="#tutorial3" data-toggle="modal"><img src="/assets/img/tutoriales/faq.png" alt="Preguntas Frecuentes" width="100%"></a>
             </div>
         </div>
     </div>
-
+    <!-- Categorías -->
     <div class="sidebar-module">
-        <div class="panel panel-default">
+        <div class="panel panel-primary">
+            <div class="panel-heading">Categorías</div>
             <div class="panel-body">
-                <h4>Categorías</h4>
                 <div class="categories">
                     <a class="label label-light label-primary margen" href="/tagbsq/71">Agua limpia y saneamiento</a>
                     <a class="label label-light label-primary margen" href="/tagbsq/18">Fin de la pobreza</a>
@@ -42,10 +45,19 @@
             </div>
         </div>
     </div><!-- /.sidebar-module -->
+    <!-- Gráficos -->
     <div class="sidebar-module">
-        <div class="panel panel-default">
+        <div class="panel panel-success">
+            <div class="panel-heading"> Estadísticas</div>
             <div class="panel-body">
-                <h4>Archivos</h4>
+                <canvas id="myChart" width="250" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="sidebar-module">
+        <div class="panel panel-warning">
+            <div class="panel-heading">Archivos</div>
+            <div class="panel-body">
                 <form action="/b_fecha" method="POST">
                     <label>Desde:</label>
                     <input type="date" name="desde" class="form-control">
@@ -59,9 +71,9 @@
     </div><!-- /.sidebar-module -->
 
     <div class="sidebar-module">
-        <div class="panel panel-default">
+        <div class="panel panel-info">
+            <div class="panel-heading">Redes Sociales</div>
             <div class="panel-body">
-                <h4>Redes Sociales</h4>
                 <ol class="list-unstyled">
                     <li><a href="https://www.facebook.com/observaciudadania" target="_blank">Facebook</a></li>
                     <li><a href="https://www.instagram.com/observaciudadania" target="_blank">Instagram</a></li>
@@ -84,95 +96,7 @@
 
 <button class="material-scrolltop primary" type="button"></button>
 <!-- Modals -->
-<div class="modal fade" id="aa" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h2 class="modal-title" id="myModalLabel">Crear Post</h2>
-            </div>
-            <form id="mform">
-                <div class="modal-body">
-                    <div id="preview"></div>
-                    <div class="form-group">
-                        <%  if(usr.tipo == 1){ %>
-                                <select name="idobserva" class="form-control">
-                                    <option value="" disabled selected>Seleccione un observatorio</option>
-                        <%
-                                    for(var j = 0; j<obs.length;j++){
-                            %>
-                                    <option value="<%= obs[j].idobservatorio%>"><%= obs[j].nom%></option>
-                        <%
-
-                                    }%>
-                                    <option value="no">Sin observatorio</option>
-                                </select>
-                        <%
-                            } else if(usr.tipo == 3){%>
-                                <input name="idobserva" type="hidden" value="<%= obs[0].idobservatorio%>">
-                        <%}%>
-
-                        <input type="text" name="tit" id="t_princ" class="form-control" placeholder="" required>
-                        <div class="input-group hidden" id="fail">
-                            <input type="file" name="filetoupload" onchange="upload(this)">
-                            <a class="input-group-btn btn btn-success">Sube una foto <i class="glyphicon glyphicon-upload"></i></a>
-                        </div>
-                        <select id="catego" class="form-control hidden" name="cat">
-                            <option value="" disabled selected>Selecciona una categoría </option>
-                            <option value="18">Fin de la Pobreza</option>
-                            <option value="78">Acción por el Clima</option>
-                            <option value="71">Agua limpia y saneamiento</option>
-                            <option value="82">Alianzas para lograr Objetivos</option>
-                            <option value="76">Ciudades y comunidades Sostenibles</option>
-                            <option value="69">Educación de Calidad</option>
-                            <option value="72">Energía asequible y no contaminante</option>
-                            <option value="67">Hambre Cero</option>
-                            <option value="70">Igualdad de Género</option>
-                            <option value="74">Industria Innovación e infraestructura</option>
-                            <option value="81">Paz justicia e Instituciones solidas</option>
-                            <option value="77">Producción y consumo responsable</option>
-                            <option value="75">Reducción de Desigualdades</option>
-                            <option value="68">Salud y Bienestar</option>
-                            <option value="73">Trabajo Decente y crecimiento económico</option>
-                            <option value="80">Vida de Ecosistemas terrestres</option>
-                            <option value="79">Vida submarina</option>
-                        </select>
-                        <textarea type="text" name="texto" class="hidden" id="editor"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <input type="hidden"  id="tipo" name="tipo" value="">
-                    <div class="form-group form-inline">
-                        <input type='text' class='form-control' name='tags' id="tag" value="" placeholder="tags (Ej: tag1, tag2, tag3)">
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary mform">+ Post</button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="rm_pst" tabindex="-1" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h2 class="modal-title" id="myModalLabel">Eliminar Post</h2>
-            </div>
-            <div class="modal-body">
-                <p>¿Estás seguro que quieres borrar este post?</p>
-            </div>
-            <div class="modal-footer">
-                <div class="btn-group">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                    <a class="btn btn-danger" id="rm_real">Si, Eliminar</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<%- include modal.ejs %>
 
 <link href="/assets/css/jquery-te-1.4.0.css" rel="stylesheet">
 <script src="/assets/js/jquery-te-1.4.0.min.js"></script>

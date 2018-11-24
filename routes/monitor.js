@@ -158,9 +158,28 @@ exports.drop_cdd = function (req, res) {
                 connection.query('UPDATE user SET tipo = 4 WHERE iduser = ?',input.iduser,function(err,rows)
                 {
 
-                    if(err)
-                        console.log("Error Selecting : %s ",err );
-                    res.redirect('/obs_usr/' + input.idobs);
+                    if(err) console.log("Error Selecting : %s ",err );
+                    connection.query('SELECT observatorio.idobservatorio, observatorio.nom, user.iduser, user.correo, user.username, user.tipo FROM user'
+                        +' JOIN observatorio ON observatorio.idobservatorio = ' + input.idobs
+                        +' WHERE user.iduser = ' + input.iduser, function(err,rows)
+                        {
+                        //Variables para envio de correo, data_mail debe tener las mismas variables
+                        var obs = new Array(rows[0].nom, input.idobs); //Envia el nombre del obs y su id para la url
+                        var mails = new Array(rows[0].correo); //Debe ser array!
+                        var subj = "Eliminación del observatorio " + rows[0].nom;
+                        var data_mail = {
+                            view: "views\\admin\\obs\\obs_archive.ejs", //Path
+                            subject: subj, //Asunto del mensaje
+                            inf: obs, //Array con informacion de observatorio
+                            mails: mails}; //Array de los correos
+                        send.send_mail(data_mail,function(err) {
+                            if(err){
+                                console.log(err.message);
+                            }
+                        });
+                        console.log("Se elimino a " + rows[0].correo + " de observatorio " + input.idobs + ", mail enviado correctamente.");
+                        res.redirect('/obs_usr/' + input.idobs);
+                    });
 
                 });
 

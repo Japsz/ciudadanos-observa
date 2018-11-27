@@ -134,6 +134,8 @@ app.post('/mod',admin.moderate_p);
 //Users
 
 app.get('/user', admin.list);
+app.get('/user_cdd', admin.user_cdd);
+app.post('/user_cdd/list', admin.cdd_list);
 app.get('/user/add', admin.add);
 app.post('/user/add', admin.save);
 app.get('/send_recovery_mail/:correo', users.send_mail);

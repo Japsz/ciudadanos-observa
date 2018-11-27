@@ -1,0 +1,77 @@
+<table class="table table-responsive table-bordered">
+    <tr class="active">
+        <th>Nombre</th>
+        <th>Nombre usuario</th>
+        <th>Correo</th>
+        <th>Tipo</th>
+        <th>Contraseña</th>
+        <th>Fecha de Nacimiento</th>
+        <th>N° Post</th>
+        <th>N° Coment</th>
+        <th>Genero</th>
+        <th>Observatorio</th>
+        <th>Activo</th>
+    </tr>
+    <% if(data.length){ 
+        var usrtype;
+        for(var i = 0;i < data.length;i++) {
+            switch(data[i].tipo) {
+                case 1:
+                    usrtype = "Monitor";
+                    break;
+                case 2:
+                    usrtype = "Moderador";
+                    break;
+                case 3:
+                    usrtype = "Ciudadano";
+                    break;
+                default:
+                    usrtype = "notype";
+
+            }%>
+        <tr>
+            <td><%= data[i].nombre %></td>
+            <td><%= data[i].username %></td>
+            <td><%= data[i].correo %></td>
+            <td><%= usrtype %></td>
+            <td><%= data[i].password %></td>
+            <td><%= new Date(data[i].fnac).toLocaleDateString() %></td>
+            <td><%= data[i].post %></td>
+            <td><%= data[i].comentarios %></td>
+            <td>
+                <%switch(data[i].gender){
+                    case 1:
+                        %>F<%
+                        break;
+                    case 0:%>M<%
+                        break;
+                    default:
+                        %>Otro<%
+                }%>
+            </td>
+            <td>
+                <% if(data[i].tipo == 3 && data[i].obsinfo != null){%>
+                    <ul style="padding-left: 10px; margin: 0">
+                        <%
+                        for(var j = 0;j< data[i].obsinfo.length;j++){%>
+                        <a href="/show_obs/<%=data[i].obsinfo[j][0]%>">
+                            <li><strong><%=data[i].obsinfo[j][1]%></strong>  (<small><%=data[i].obsinfo[j][2]%></small>)</li>
+                        </a>
+                        <%}%>
+                    </ul>
+                <%}%>
+            </td>
+            <% if(data[i].fecha_comentario > 0 || data[i].fecha_post > 0){ 
+                %><td>Si</td><%
+            } else {
+                %><td class="danger">No</td><%
+            }%>
+        </tr>
+        <%}
+    }else{ %>
+        <tr>
+            <td colspan="10">No existen usuarios para mostrar</td>
+        </tr>
+     <%}%>
+                  
+</table>

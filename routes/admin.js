@@ -1,6 +1,6 @@
 var send = require('../routes/sendmails'); //Importar la funcion para enviar mail
 
-//Vista lista de usuarios.
+//Vista lista de monitores.
 exports.list = function(req, res){
 	if(req.session.isAdminLogged){
 		req.getConnection(function(err,connection){
@@ -35,6 +35,65 @@ exports.list = function(req, res){
 		}
 		else res.redirect('/bad_login');  
 };
+
+// Renderiza Vista de usuarios.
+exports.user_cdd = function(req, res){
+    if(req.session.isAdminLogged){
+        res.render('user_cdd', {page_title:"Stats", usr:req.session.user});
+    }
+    else res.redirect('/bad_login');  
+};
+
+//Vista lista de ciudadanos.
+exports.cdd_list = function(req, res){
+    if(req.session.isAdminLogged){
+        // Obtiene data de POST
+        var input = JSON.parse(JSON.stringify(req.body));
+        var clave = input.clave;
+        // Agrega los datos del filtro
+        var search = "";
+        if(clave != ""){
+            search += " AND (user.correo LIKE '%" + clave + "%' OR user.nombre LIKE '%" + clave + "%' OR user.username LIKE '%" + clave + "%')";
+        }
+        var fecha = new Date();
+        var fecha_1 = "" + fecha.getFullYear() + "-" + (fecha.getMonth()+1);
+        var fecha_2 = "" + fecha.getFullYear() + "-" + fecha.getMonth();
+        if(fecha.getMonth() == 0){
+            fecha_2 = "" + fecha.getFullYear() + "-12";
+        }
+        req.getConnection(function(err,connection){
+            connection.query("SELECT user.*,GROUP_CONCAT(observatorio.idobservatorio,'&&',observatorio.nom,'&&',institucion.nom) as obsinfo,"
+                + " (SELECT COUNT(comentario.iduser) FROM comentario WHERE comentario.iduser=user.iduser) as comentarios,"
+                + " (SELECT COUNT(post.iduser) FROM post WHERE post.iduser=user.iduser) as post,"
+                + " (SELECT COUNT(comentario.fecha) FROM comentario where comentario.iduser=user.iduser AND comentario.fecha LIKE '%" + fecha_1 + "%' OR '%" + fecha_2 + "%') as fecha_comentario,"
+                + " (SELECT COUNT(post.fecha) as fecha_post FROM post where post.iduser=user.iduser AND post.fecha LIKE '%" + fecha_1 + "%' OR '%" + fecha_2 + "%') as fecha_post"
+                + " FROM user"
+                + " LEFT JOIN ciudadano ON ciudadano.iduser=user.iduser"
+                + " LEFT JOIN observatorio ON observatorio.idobservatorio = ciudadano.idobs"
+                + " LEFT JOIN institucion ON institucion.idinstitucion = observatorio.idinst"
+                + " WHERE user.tipo = 3" + search + " GROUP BY user.iduser",function(err,cdd)
+            {
+                if(err) console.log("Error Selecting : %s ",err );
+                var aux= [];
+                var aux2;
+                for(var i=0;i<cdd.length;i++){
+                    console.log(cdd[i].obsinfo);
+                    if(cdd[i].tipo == 3 && typeof cdd[i].obsinfo != "object"){
+                        aux2 = cdd[i].obsinfo.split(",");
+                        for(var j = 0;j<aux2.length;j++){
+                            aux.push(aux2[j].split("&&"));
+                        }
+                        cdd[i].obsinfo = aux;
+                    }
+                    aux = [];
+                }
+                res.render('table_cdd',{page_title:"Stats", data: cdd, usr:req.session.user});
+            });
+        });
+    }
+    else res.redirect('/bad_login'); 
+};
+
 exports.modproy = function(req,res){
     if(req.session.isAdminLogged){
         req.getConnection(function(err,connection){

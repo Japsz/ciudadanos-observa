@@ -237,6 +237,7 @@
 
 
     $(function () {
+        // Modificar un post rechazado
         $(".mform").click( function(e){
             e.preventDefault();
             $(this).attr('disabled',true);
@@ -368,7 +369,7 @@
                 }
             });
     });
-
+    // Subir archivo con onchange En formulario. Ver linea 32 en layouts/modal.ejs
     function upload(e){
 
         if (!e.files) {
@@ -382,7 +383,7 @@
             formData.append("filetoupload", e.files[0]);
             $(function (){
                $.ajax({
-                   url: '/subir_pic',
+                   url: '/subir_pic', //Linea 209 en hello.js
                    data: formData,
                    cache: false,
                    contentType: false,

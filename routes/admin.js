@@ -62,7 +62,7 @@ exports.cdd_list = function(req, res){
             fecha_2 = "" + fecha.getFullYear() + "-12";
         }
         req.getConnection(function(err,connection){
-            connection.query("SELECT user.*,GROUP_CONCAT(observatorio.idobservatorio,'&&',observatorio.nom,'&&',institucion.nom) as obsinfo,"
+            connection.query("SELECT user.*,ciudadano.medal,GROUP_CONCAT(observatorio.idobservatorio,'&&',observatorio.nom,'&&',institucion.nom) as obsinfo,"
                 + " (SELECT COUNT(comentario.iduser) FROM comentario WHERE comentario.iduser=user.iduser) as comentarios,"
                 + " (SELECT COUNT(post.iduser) FROM post WHERE post.iduser=user.iduser) as post,"
                 + " (SELECT COUNT(comentario.fecha) FROM comentario where comentario.iduser=user.iduser AND comentario.fecha LIKE '%" + fecha_1 + "%' OR '%" + fecha_2 + "%') as fecha_comentario,"
@@ -71,7 +71,7 @@ exports.cdd_list = function(req, res){
                 + " LEFT JOIN ciudadano ON ciudadano.iduser=user.iduser"
                 + " LEFT JOIN observatorio ON observatorio.idobservatorio = ciudadano.idobs"
                 + " LEFT JOIN institucion ON institucion.idinstitucion = observatorio.idinst"
-                + " WHERE user.tipo = 3" + search + " GROUP BY user.iduser",function(err,cdd)
+                + " " + search + " GROUP BY user.iduser",function(err,cdd)
             {
                 if(err) console.log("Error Selecting : %s ",err );
                 var aux= [];
@@ -87,12 +87,30 @@ exports.cdd_list = function(req, res){
                     }
                     aux = [];
                 }
-                res.render('table_cdd',{page_title:"Stats", data: cdd, usr:req.session.user});
+                connection.query("SELECT observatorio.*,COUNT(DISTINCT ciudadano.iduser) AS num_cdd,institucion.nom AS inst_nom FROM observatorio" +
+                    " LEFT JOIN ciudadano ON ciudadano.idobs = observatorio.idobservatorio" +
+                    " LEFT JOIN institucion ON institucion.idinstitucion = observatorio.idinst" +
+                    " WHERE observatorio.estado != 3 GROUP BY observatorio.idobservatorio",function(err,rows){
+                    if(err) console.log("Error selecting observatorios : %s",err);
+                    res.render('table_cdd',{page_title:"Stats", data: cdd, usr:req.session.user,obs: rows});
+                });
             });
         });
     }
     else res.redirect('/bad_login'); 
 };
+//Controlador Cambiar de observatorio un cdd
+exports.change_obs = function(req,res){
+    if(req.session.isAdminLogged){
+        req.getConnection(function (err,connection){
+            if(err) console.log("Error on connection: %s",err);
+            connection.query("UPDATE ciudadano SET idobs = ? WHERE iduser = ?",[req.body.idobs,req.body.iduser],function(err,rows){
+                if(err) console.log("Error on update: %s",err);
+                res.send({err:false,err_msg:"Exito en la modifiación"});
+            });
+        })
+    } else res.send({err: true,err_msg:"No tienes permisos"});
+}
 
 exports.modproy = function(req,res){
     if(req.session.isAdminLogged){

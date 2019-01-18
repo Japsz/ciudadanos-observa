@@ -6,10 +6,20 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h2 class="modal-title" id="myModalLabel">Crear Post</h2>
             </div>
-            <form id="mform">
                 <div class="modal-body">
                     <div id="preview"></div>
                     <div class="form-group">
+                        <form id="fail_form" onsubmit="return false">
+                            <div class="input-group hidden" id="fail">
+                                <input type="file" name="filetoupload" onchange="upload(this)">
+                                <a class="input-group-btn btn btn-success">Sube una foto <i class="glyphicon glyphicon-upload"></i></a>
+                            </div>
+                            <div class="progress">
+                                <div id="mybar" class="progress-bar"></div>
+                            </div>
+                            <div id="status"></div>
+                        </form>
+                        <form id="mform">
                         <%  if(usr.tipo == 1){ %>
                         <select name="idobserva" class="form-control">
                             <option value="" disabled selected>Seleccione un observatorio</option>
@@ -28,10 +38,6 @@
                         <%}%>
 
                         <input type="text" name="tit" id="t_princ" class="form-control" placeholder="" required>
-                        <div class="input-group hidden" id="fail">
-                            <input type="file" name="filetoupload" onchange="upload(this)">
-                            <a class="input-group-btn btn btn-success">Sube una foto <i class="glyphicon glyphicon-upload"></i></a>
-                        </div>
                         <select id="catego" class="form-control hidden" name="cat">
                             <option value="" disabled selected>Selecciona una categoría </option>
                             <option value="18">Fin de la Pobreza</option>

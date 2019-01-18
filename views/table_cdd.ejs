@@ -1,10 +1,10 @@
 <table class="table table-responsive table-bordered" id="cdd_table">
-    <tr class="active">
+    <thead>
+    <tr>
         <th>Nombre</th>
         <th>Nombre usuario</th>
         <th>Correo</th>
-        <th>Tipo</th>
-        <th>Contraseña</th>
+        <th>Badge</th>
         <th>Fecha de Nacimiento</th>
         <th>N° Post</th>
         <th>N° Coment</th>
@@ -12,7 +12,9 @@
         <th>Observatorio</th>
         <th>Activo</th>
     </tr>
-    <% if(data.length){ 
+    </thead>
+    <tbody>
+    <% if(data.length){
         var usrtype;
         for(var i = 0;i < data.length;i++) {
             switch(data[i].tipo) {
@@ -29,12 +31,11 @@
                     usrtype = "notype";
 
             }%>
-        <tr>
+        <tr id="cdd_<%= data[i].iduser%>">
             <td><%= data[i].nombre %></td>
             <td><%= data[i].username %></td>
             <td><%= data[i].correo %></td>
-            <td><%= usrtype %></td>
-            <td><%= data[i].password %></td>
+            <td><%= data[i].medal %></td>
             <td><%= new Date(data[i].fnac).toLocaleDateString() %></td>
             <td><%= data[i].post %></td>
             <td><%= data[i].comentarios %></td>
@@ -49,16 +50,22 @@
                         %>Otro<%
                 }%>
             </td>
-            <td>
+            <td style="width: 15%">
                 <% if(data[i].tipo == 3 && data[i].obsinfo != null){%>
-                    <ul style="padding-left: 10px; margin: 0">
-                        <%
-                        for(var j = 0;j< data[i].obsinfo.length;j++){%>
-                        <a href="/show_obs/<%=data[i].obsinfo[j][0]%>">
-                            <li><strong><%=data[i].obsinfo[j][1]%></strong>  (<small><%=data[i].obsinfo[j][2]%></small>)</li>
-                        </a>
-                        <%}%>
-                    </ul>
+                    <% for(var j = 0;j< data[i].obsinfo.length;j++){%>
+                        <div class="btn-group" style="width:100%" role="group">
+                            <a href="/show_obs/<%=data[i].obsinfo[j][0]%>" class="btn btn-primary" role="button">
+                                <strong><%=data[i].obsinfo[j][1]%></strong>
+                            </a>
+                            <button type="button" onclick="upd_modal_obs(this)" class="btn btn-warning"
+                                    data-target="#change_obs"
+                                    data-toggle="modal"
+                                    data-obs="<%=data[i].obsinfo[j][1]%>"
+                                    data-inst="<%=data[i].obsinfo[j][2]%>"
+                                    data-iduser="<%= data[i].iduser%>"><i class="fa fa-wrench"></i></button>
+                            <a class="btn btn-danger" href="/user/delete/<%= data[i].iduser%>" role="button"><i class="fa fa-minus"></i></a>
+                        </div>
+                     <%}%>
                 <%}%>
             </td>
             <% if(parseInt(data[i].fecha_comentario) > 0 || parseInt(data[i].fecha_post) > 0){
@@ -73,8 +80,81 @@
             <td colspan="10">No existen usuarios para mostrar</td>
         </tr>
      <%}%>
-                  
+    </tbody>
 </table>
-<script type="text/javascript">
 
+<script type="text/javascript">
+    $("#cdd_table").dataTable({
+        "language": {
+            "url": "https://cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+        }
+    });
+    function upd_modal_obs(yo){
+        var esto = $(yo);
+        $("#modal_obs_actual").html(esto.data('obs') + " (" + esto.data('inst') +")");
+        $("#user_cdd").val(esto.data('iduser'));
+    }
+    function upd_cdd(){
+        var data = {
+            iduser: $("#user_cdd").val(),
+            idobs: $("#modal_obs_next").val()
+        }
+        $.ajax({
+            url: '/change_cdd',
+            type: 'post',
+            data: data,
+            success: function(data){
+                alert(data.err_msg);
+                if(!data.err){
+                    location.reload();
+                }
+            }
+        })
+    }
 </script>
+<div class="modal fade" id="change_obs" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3 class="modal-title" id="myModalLabel">Cambiar Observatorio</h3>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h4 style="margin-top: 10px">Observatorio Actual:</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <h4 id="modal_obs_actual"></h4>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 20px">
+                    <div class="col-md-6">
+                        <h4 style="margin-top: inherit">Observatorio Nuevo:</h4>
+                    </div>
+                    <div class="col-md-12">
+                        <form id="chng_obs">
+                            <% if(obs.length){%>
+                            <select name="razon" class="form-control" id="modal_obs_next">
+                                <option value="#" disabled selected>Elija un Observatorio</option>
+                                <% for(let i = 0;i<obs.length;i++){%>
+                                <option value="<%= obs[i].idobservatorio%>"><%= obs[i].nom%> (<%= obs[i].inst_nom%>)</option>
+                                <%}%>
+                            </select>
+                            <%}%>
+                            <input type="hidden" id="user_cdd" value="">
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="form-group form-inline">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                        <button onclick="upd_cdd()" data-dismiss="modal"  class="btn btn-primary">Confirmar Cambio</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

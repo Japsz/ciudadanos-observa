@@ -53,7 +53,7 @@ app.use(
     connection(mysql,{
 
         host: '127.0.0.1',
-        user: 'root',
+        user: 'obs',
         password : 'observaproyecta',
         port : 3306,
         database:'Observapp'
@@ -104,7 +104,7 @@ app.post('/m_post', cdd.m_post);
 app.post('/cdd/edit', cdd.save_edit);
 app.get('/cdd_edit',cdd.edit);
 app.get('/cdd_cedit',cdd.commitedit);
-app.get('/f_login',cdd.edit_f);
+app.get('/f_login/:idobs/:iduser',cdd.edit_f);
 app.post('/cdd/edit_f', cdd.save_edit_f);
 app.post('/comment/add_s', cdd.save_comment_single);
 app.post('/comment/add', cdd.save_comment);
@@ -131,20 +131,23 @@ app.post('/post/edit/:idpost', posts.p_edit);
 app.get('/mod_proys',admin.modproy);
 app.post('/mod',admin.moderate_p);
 
-//Users
+// Admin
 
 app.get('/user', admin.list);
 app.get('/user_cdd', admin.user_cdd);
 app.post('/user_cdd/list', admin.cdd_list);
 app.get('/user/add', admin.add);
 app.post('/user/add', admin.save);
+app.post('/admin_add_cdd', admin.save_cdd);
 app.get('/send_recovery_mail/:correo', users.send_mail);
 app.get('/reset_pass/:recovery', users.reset_pass);
-app.post('/validate_recovery', users.validate_recovery);
-
 app.get('/user/delete/:iduser', admin.delete_user);
 app.get('/user/edit/:username', admin.edit);
 app.post('/user/edit/:username',admin.save_edit);
+
+//Users
+
+app.post('/validate_recovery', users.validate_recovery);
 app.post('/monit_stream', users.get_monit);
 app.post('/obsmonit_stream', users.get_obsmonit);
 app.post('/obsmonit_add', users.add_obsmonit);

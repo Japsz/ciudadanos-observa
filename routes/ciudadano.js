@@ -324,10 +324,26 @@ exports.save_edit = function(req, res){
     }
 };
 exports.edit_f = function(req, res){
-
-    if(req.session.isUserLogged){
-
-        res.render('cdd/f_login',{data: req.session.user,usr:req.session.user, obs: req.session.idobs});
+    if(req.params.iduser == 0){
+        if(req.session.isUserLogged){
+            res.render('cdd/f_login',{data: req.session.user, obs: req.session.idobs});
+        } else {
+            res.redirect('/bad_login');
+        }
+    }
+    else {
+        var idobs = req.params.idobs;
+        var iduser = req.params.iduser;
+        req.getConnection(function(err,connection){
+            connection.query("SELECT * FROM user WHERE iduser = ? ",[iduser],function(err,rows){
+                if(err) console.log("Error Selecting : %s ",err );
+                if(rows.length == 1){
+                    req.session.user = rows[0];
+                    req.session.isUserLogged = true;
+                    res.render('cdd/f_login',{data: rows[0], obs: idobs});
+                }
+            });
+        });
     }
 };
 exports.save_edit_f = function(req, res){

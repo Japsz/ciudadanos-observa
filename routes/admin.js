@@ -94,6 +94,106 @@ exports.cdd_list = function(req, res){
     else res.redirect('/bad_login'); 
 };
 
+// Logica agregar cdd a obs.
+exports.save_cdd = function(req,res){
+    if(req.session.isAdminLogged){
+        var input = JSON.parse(JSON.stringify(req.body));
+        var generator = require('generate-password');
+        // Generar clave alfanumérica
+        var pass = generator.generate({length : 7,numbers : true});
+        req.getConnection(function (err, connection) {
+            var data = {
+                nombre     : input.nom,
+                apellido   : input.apellido,
+                username   : input.username,
+                fnac       : input.fnac,
+                password   : pass,
+                tipo       : 3,
+                correo     : input.correo
+            };
+            //Verificar si el correo ya está registrado
+            connection.query("SELECT * FROM user WHERE correo = ?", input.correo, function(err, rows) {
+                if(err) console.log("Error Selecting correo: %s",err);
+                if(rows.length){
+                    // Si existe, borrarlo de su observatorio y vincularlo al observatorio
+                    connection.query("DELETE FROM ciudadano WHERE iduser = " + rows[0].iduser, function(err, r) {
+                        if(err) console.log("Error deleting : %s ",err );
+                        connection.query("INSERT INTO ciudadano SET ?",{idobs : input.idobs, iduser : rows[0].iduser}, function(err, rowss) {
+                            if (err) {
+                                console.log("Error inserting : %s ",err );
+                            } else {
+                                // Volver a habilitar el usuario tipo 4 => tipo 3
+                                connection.query("UPDATE user SET tipo = 3 WHERE correo = ?",input.correo, function(err, rowsss) {
+                                    if (err) console.log("Error Inserting cdd : %s ", err);
+                                    // Reactivacion de usuario y Envio de mail
+                                    connection.query("SELECT nom FROM observatorio WHERE idobservatorio=?", input.idobs,function(err, obs) {
+                                        if(err) {
+                                            console.log("Error Selecting observatorio: %s",err);
+                                        } else {
+                                            //Variables para envio de correo, data_mail debe tener las mismas variables
+                                            var info = new Array(obs[0].nom, input.idobs, rows[0].iduser); //Envia el nombre del obs y su id para la url
+                                            var mails = new Array(input.correo); //Debe ser array!
+                                            var subj = "Bienvenido a observatorio " + input.nom;
+                                            var data_mail = {
+                                                view: "views\\monitor\\save_cdd.ejs", //Path
+                                                subject: subj, //Asunto del mensaje
+                                                inf: info, //Array con informacion necesaria
+                                                mails: mails}; //Array de los correos
+                                            send.send_mail(data_mail,function(err) {
+                                                if(err){
+                                                    console.log(err.message);
+                                                }
+                                            });
+                                            console.log("Se vinculo a " + input.correo + " a observatorio " + input.idobs + ", mail enviado correctamente.");
+                                            res.redirect('/show_obs/' + input.idobs);
+                                        }
+                                    });
+                                });
+                            }
+                        });
+                    });
+                } else {
+                    // Si no está registrado el correo, crear usuario
+                    connection.query("INSERT INTO user SET ? ",data, function(err, rows) {
+                        if (err){
+                            console.log("Error inserting : %s ",err );
+                        } else {
+                            // Vincular usuario creado al observatorio
+                            connection.query("INSERT INTO ciudadano SET ?",{idobs : input.idobs, iduser : rows.insertId}, function(err, rowss) {
+                                if (err) console.log("Error Inserting cdd : %s ", err);
+                                // Reactivacion de usuario y Envio de mail
+                                connection.query("SELECT nom FROM observatorio WHERE idobservatorio=?", input.idobs,function(err, obs) {
+                                    if(err) {
+                                        console.log("Error Selecting observatorio: %s",err);
+                                    } else {
+                                        //Variables para envio de correo, data_mail debe tener las mismas variables
+                                        var info = new Array(obs[0].nom, input.idobs, rows.insertId); //Envia el nombre del obs y su id para la url
+                                        var mails = new Array(input.correo); //Debe ser array!
+                                        var subj = "Bienvenido a observatorio " + input.nom;
+                                        var data_mail = {
+                                            view: "views\\monitor\\save_cdd.ejs", //Path
+                                            subject: subj, //Asunto del mensaje
+                                            inf: info, //Array con informacion necesaria
+                                            mails: mails}; //Array de los correos
+                                        send.send_mail(data_mail,function(err) {
+                                            if(err){
+                                                console.log(err.message);
+                                            }
+                                        });
+                                        console.log("Se vinculo a " + input.correo + " a observatorio " + input.idobs + ", mail enviado correctamente.");
+                                        res.redirect('/show_obs/' + input.idobs);
+                                    }
+                                });
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    }
+    else res.redirect('/bad_login');
+};
+
 exports.modproy = function(req,res){
     if(req.session.isAdminLogged){
         req.getConnection(function(err,connection){

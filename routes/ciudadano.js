@@ -328,7 +328,7 @@ exports.edit_f = function(req, res){
         if(req.session.isUserLogged){
             res.render('cdd/f_login',{data: req.session.user, obs: req.session.idobs});
         } else {
-            res.redirect('/bad_login');
+            res.redirect('/indx');
         }
     }
     else {

@@ -93,9 +93,12 @@
 <!-- Modals -->
 <%- include modal.ejs %>
 
+<script src="/assets/js/jquery-form.js"></script>
+<!-- Editor de texto -->
 <link href="/assets/css/jquery-te-1.4.0.css" rel="stylesheet">
 <script src="/assets/js/jquery-te-1.4.0.min.js"></script>
-<script src="/assets/js/ripples.min.js"></script>1
+<!-- Tema de Bootstrap  -->
+<script src="/assets/js/ripples.min.js"></script>
 <script src="/assets/js/material.min.js"></script>
 <script src="/assets/js/material-scrolltop.js"></script>
 <script src="/assets/js/main.js"></script>
@@ -262,6 +265,7 @@
                 }
             });
         });
+        <!-- Setea los tags -->
         $(".blog-post-meta :input.hidden").each(function (j) {
             var tagger = $(this).val();
             var idpost = "#" + $(this).data('id');
@@ -275,6 +279,7 @@
 
             }
         });
+        <!-- Busca si pusiste laik o no a un post según su token de iduser1,iduser2,iduser3 -->
         $(".blog-post-share :input.laiktoken").each(function (j) {
             var tagger = $(this).val();
             var idpost = "#" + $(this).data('id');
@@ -287,6 +292,7 @@
                 }
             }
         });
+        <!-- Botón Comentar -->
         $(".comm").click(function (e) {
             var data = {};
             data.idpost = $(this).data('id');
@@ -302,6 +308,7 @@
                 }
             });
         });
+        <!-- Botón hacer laik -->
         $('.laik').click(function(e){
             /*$.ajax({
              dataType: 'jsonp',
@@ -339,64 +346,79 @@
              error  : function() { console.log('error');}
              });*/
         });
-
-
-
-            //ajax para crear estadísticas
-            $.ajax({
-                //conectar "datos" con la creación de el gráfico
-                type: 'GET',
-                url: "/get_stats",
-                success: function(data){
-                    var ctx = document.getElementById('myChart').getContext('2d');
-                    var chart = new Chart(ctx, {
-                        type: 'pie',
-                        data: {
-                            labels: ["Estudiantes", "Colegios", "Post", "Comentarios"],
-                            datasets: [{
-                                label: "Participacion",
-                                backgroundColor: [
-                                    'rgba(255, 99, 132, 1)',
-                                    'rgba(54, 162, 235, 1)',
-                                    'rgba(255, 206, 86, 1)'
-                                ],
-                                borderColor: 'rgb(150, 150, 150)',
-                                data: [data[0], data[1], data[2], data[3]]
-                            }]
-                        },
-                        options: {}
-                    });
-                }
-            });
+        //ajax para crear estadísticas
+        $.ajax({
+            //conectar "datos" con la creación de el gráfico
+            type: 'GET',
+            url: "/get_stats",
+            success: function(data){
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var chart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ["Estudiantes", "Colegios", "Post", "Comentarios"],
+                        datasets: [{
+                            label: "Participacion",
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)'
+                            ],
+                            borderColor: 'rgb(150, 150, 150)',
+                            data: [data[0], data[1], data[2], data[3]]
+                        }]
+                    },
+                    options: {}
+                });
+            }
+        });
     });
     // Subir archivo con onchange En formulario. Ver linea 32 en layouts/modal.ejs
-    function upload(e){
-
+    function upload(e,form,barra){
+        $("#submit_post").attr("disabled",true);
         if (!e.files) {
             alert("This browser doesn't seem to support the `files` property of file inputs.");
+            $("#submit_post").attr("disabled",false);
         }
         else if (!e.files[0]) {
             alert("Porfavor seleccione algún archivo");
+            $("#submit_post").attr("disabled",false);
         }
         else {
-            var formData = new FormData();
-            formData.append("filetoupload", e.files[0]);
-            $(function (){
-               $.ajax({
-                   url: '/subir_pic', //Linea 209 en hello.js
-                   data: formData,
-                   cache: false,
-                   contentType: false,
-                   processData: false,
-                   type: 'POST',
-                   success: function(data){
-                       $("#preview").html("<img width='auto' class='img-responsive' src='" + data + "' >");
-                       $("#avat").val(data);
-                       $("#t_princ").val(data);
-                       $("#t_princ").addClass("hidden");
-                   }
-               })
-            });
+            var formData = e.files[0];
+            if(formData.size > 15*1024*1024){
+                alert("Archivo muy grande");
+                $("#submit_post").attr("disabled",false);
+            } else {
+
+                $(function (){
+                    //Cuando el DOM este ready.
+
+                    var bar = $(barra);
+                    var options = {
+                        url: '/subir_pic',
+                        type: 'POST',
+                        beforeSend: function() {
+                            var percentVal = '0%';
+                            bar.width(percentVal);
+                        },
+                        //uploadprogress se llama a lo largo de todo el update de los datos (puede servir para todo formulario, no solo archivos)
+                        uploadProgress: function(event, position, total, percentComplete) {
+                            var percentVal = percentComplete + '%';
+                            bar.width(percentVal);
+                        },
+                        complete: function(data) {
+                            $("#preview").html("<img width='auto' class='img-responsive' src='" + data.responseText + "' >");
+                            $("#avat").val(data.responseText);
+                            $("#t_princ").val(data.responseText);
+                            $("#t_princ").addClass("hidden");
+                            $("#submit_post").attr("disabled",false);
+                        }
+                    };
+                    //Cuando se haga el submit del Form.
+                    $(form).ajaxSubmit(options);
+                });
+            }
         }
 
     }

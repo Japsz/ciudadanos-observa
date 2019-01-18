@@ -48,6 +48,13 @@ app.use(cookieSession({
 var connection  = require('express-myconnection');
 var mysql = require('mysql');
 
+var expressFU = require('express-fileupload');
+
+app.use(expressFU({
+    preserveExtension: true,
+    safeFileNames: true
+}));
+
 app.use(
 
     connection(mysql,{
@@ -97,6 +104,7 @@ app.get('/app_post/:idobs', monitor.get_prepost);
 app.get('/mod_indx', monitor.get_modpost);
 app.post('/rmm_comm', monitor.del_comment);
 app.post('/approve_comm', monitor.approve_comment);
+app.post('/upd_medal', monitor.upd_medal);
 
 //Ciudadano
 
@@ -136,6 +144,7 @@ app.post('/mod',admin.moderate_p);
 app.get('/user', admin.list);
 app.get('/user_cdd', admin.user_cdd);
 app.post('/user_cdd/list', admin.cdd_list);
+app.post('/change_cdd', admin.change_obs);
 app.get('/user/add', admin.add);
 app.post('/user/add', admin.save);
 app.post('/admin_add_cdd', admin.save_cdd);
@@ -207,28 +216,13 @@ app.get('/get_stats', function(req,res){
         //     });
         // });
     
-// catch 404 and forward to error handler
 app.post('/subir_pic', function (req,res) {
-    var formidable = require('formidable');
-    var fs = require('fs');
-    var f_gen = new Date().toLocaleString();
-    f_gen = f_gen.replace(/\s/g,'');
-    f_gen = f_gen.replace(/\:/g,'');
-    f_gen = f_gen.replace(/\//g,'');
-    f_gen = f_gen.replace(/\,/g,'');
-    f_gen = f_gen + req.session.user.iduser.toString() + ".jpg";
-    var form = new formidable.IncomingForm();
-    form.parse(req, function (err, fields, files) {
-        if(err) console.log("error file: %s",err);
-        var oldpath = files.filetoupload.path;
-        var newpath = '/home/proyecta/observa-portal/public/web-img/' + f_gen;
-        fs.rename(oldpath, newpath, function (err) {
-            if (err) throw err;
-            console.log('File uploaded and moved!');
-            res.send("/web-img/" + f_gen);
-        });
-
-    });
+    var f_gen = new Date();
+    var newname = "user" + req.session.user.iduser.toString() + "-" + f_gen.getTime() + ".jpg";
+    console.log(req.files);
+    var newpath = './public/web-img/' + newname;
+    req.files.filetoupload.mv(newpath);
+    res.send("/web-img/" + newname);
 });
 
 app.use(function(req, res, next) {

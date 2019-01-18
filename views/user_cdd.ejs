@@ -3,9 +3,6 @@
                 <div class="col-md-7">
                     <h1 style="margin-top: 0;">Ciudadanos en el sistema</h1>
                 </div>
-                <div class="col-md-5">
-                    <input type="text" id="buscar_usuarios" name="" class="form-control pull-right" placeholder="Buscar usuario..">
-                </div>
             </div>
             <br>
             <div class="row">
@@ -16,24 +13,9 @@
 <script type="text/javascript">
 
     $(document).ready(function(){
-        console.log("inicia");
         $.ajax({
             type: 'POST',
             data: {clave: ""},
-            url: '/user_cdd/list',
-            success: function(data){
-                $("#table_user").html(data);
-            }
-        });
-    });
-
-    // Filtro para buscar por nombre, username y correo
-    $("#buscar_usuarios").on('keyup', function(e){
-        e.preventDefault();
-        var searcher = this;
-        $.ajax({
-            type: 'POST',
-            data: {clave: $(this).val()},
             url: '/user_cdd/list',
             success: function(data){
                 $("#table_user").html(data);

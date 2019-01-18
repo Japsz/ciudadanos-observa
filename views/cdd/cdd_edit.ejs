@@ -14,13 +14,15 @@
                                     <h1 class="blog-post-title">Edición de perfil</h1>
                                 </div>
                                 <div class="blog-post-content">
-                                    <form action="/cdd/edit" method="POST">
-                                        <input name="avatr" id="avat" value="<%=data.avatar_pat%>" class="hidden">
+                                    <form action="return false" id="edit_form">
                                         <div class="input-group" id="fail">
                                             <div id="preview" class="center-block"><img class="img-responsive img-circle" src="<%=data.avatar_pat%>" width="100px" height="100px"></div>
                                             <label>Sube tu Avatar</label>
-                                            <input type="file" name="filetoupload"  onchange="upload(this)">
+                                            <input type="file" name="filetoupload"  onchange="upload(this,'#edit_form')">
                                         </div>
+                                    </form>
+                                    <form action="/cdd/edit" method="POST">
+                                        <input name="avatr" id="avat" value="<%=data.avatar_pat%>" class="hidden">
                                         <label for="userame">Usuario</label>
                                         <input type="text" class="form-control" name="username" value="<% if(data.username){%><%= data.username%><%}%>" required>
                                         <label for="correo">Correo</label>

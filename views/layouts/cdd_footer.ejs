@@ -374,19 +374,23 @@
         });
     });
     // Subir archivo con onchange En formulario. Ver linea 32 en layouts/modal.ejs
-    function upload(e){
-
+    function upload(e,form){
+        $("#submit_post").attr("disabled",true);
         if (!e.files) {
             alert("This browser doesn't seem to support the `files` property of file inputs.");
+            $("#submit_post").attr("disabled",false);
         }
         else if (!e.files[0]) {
             alert("Porfavor seleccione algún archivo");
+            $("#submit_post").attr("disabled",false);
         }
         else {
             var formData = e.files[0];
             if(formData.size > 15*1024*1024){
                 alert("Archivo muy grande");
+                $("#submit_post").attr("disabled",false);
             } else {
+
                 $(function (){
                     //Cuando el DOM este ready.
 
@@ -408,10 +412,11 @@
                             $("#avat").val(data.responseText);
                             $("#t_princ").val(data.responseText);
                             $("#t_princ").addClass("hidden");
+                            $("#submit_post").attr("disabled",false);
                         }
                     };
                     //Cuando se haga el submit del Form.
-                    $("#fail_form").ajaxSubmit(options);
+                    $(form).ajaxSubmit(options);
                 });
             }
         }

@@ -11,7 +11,7 @@
                     <div class="form-group">
                         <form id="fail_form" onsubmit="return false">
                             <div class="input-group hidden" id="fail">
-                                <input type="file" name="filetoupload" onchange="upload(this)">
+                                <input type="file" name="filetoupload" onchange="upload(this,'#fail_form')">
                                 <a class="input-group-btn btn btn-success">Sube una foto <i class="glyphicon glyphicon-upload"></i></a>
                             </div>
                             <div class="progress">
@@ -67,7 +67,7 @@
                         <input type='text' class='form-control' name='tags' id="tag" value="" placeholder="tags (Ej: tag1, tag2, tag3)">
                         <div class="btn-group">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary mform">+ Post</button>
+                            <button type="submit" class="btn btn-primary mform" id="submit_post">+ Post</button>
                         </div>
                     </div>
                 </div>

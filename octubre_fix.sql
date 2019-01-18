@@ -85,6 +85,7 @@ DROP TABLE IF EXISTS `ciudadano`;
 CREATE TABLE `ciudadano` (
   `idobs` int(10) unsigned NOT NULL,
   `iduser` int(11) NOT NULL,
+  `medal` VARCHAR(20) DEFAULT 'Ciudadano',
   PRIMARY KEY (`iduser`),
   KEY `fk_ciudadano_observatorio1_idx` (`idobs`),
   KEY `fk_ciudadano_user1_idx` (`iduser`),

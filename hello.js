@@ -60,7 +60,7 @@ app.use(
     connection(mysql,{
 
         host: '127.0.0.1',
-        user: 'obs',
+        user: 'root',
         password : 'observaproyecta',
         port : 3306,
         database:'Observapp'

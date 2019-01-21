@@ -38,7 +38,7 @@
             <td>
                 <%= data[i].medal %>
                 <%if (data[i].tipo == 3){ %>
-                    <button id="medal_edit" type="button" class="btn btn-primary btn-sm" data-name="<%=data[i].username%>" data-iduser="<%=data[i].iduser%>" onclick="medal_modal(this)">
+                    <button data-toggle="modal" data-target="#change_medal_modal" class="btn btn-primary btn-sm" data-name="<%=data[i].username%>" data-iduser="<%=data[i].iduser%>" onclick="medal_modal(this)">
                         <i class="fa fa-wrench"></i>
                     </button>
                 <%}%>
@@ -89,6 +89,29 @@
      <%}%>
     </tbody>
 </table>
+<!-- Modal cambiar medal -->
+<div id="change_medal_modal" tabindex="-1" role="dialog" class="modal fade">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom: 5px">
+                <h4 id="change_modal_title"></h4>
+            </div>
+            <form id="change_medal">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Nueva badge</label>
+                        <input class="form-control" type="text" id="new_medal" maxlength="12" minlength="1" name="new_medal">
+                        <input class="hidden" type="text" id="medal_iduser" value="" name="iduser">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <script type="text/javascript">
     $("#cdd_table").dataTable({
@@ -120,35 +143,28 @@
     }
 
     function medal_modal(caller) {
-        var medal_modal = $('#change_medal_modal')
-        medal_modal.find('h4').text('Cambiar Medal de '+ $(caller).data('name'));
-        medal_modal.find('#iduser').val($(caller).data('iduser'));
-        medal_modal.modal('toggle');
+        $("#change_modal_title").html('Cambiar Medal de '+ $(caller).data('name'));
+        $("#medal_iduser").val($(caller).data('iduser'));
     };
-
-
+    $("#change_medal").submit(function (e){
+        e.preventDefault();
+        $.ajax({
+            url: "/upd_medal",
+            type: 'post',
+            data: {
+                medal: $("#new_medal").val(),
+                iduser: $("#medal_iduser").val()
+            },
+            success: function(data){
+                if(!data.err){
+                    alert(data.errmsg);
+                    location.reload();
+                } else alert(data.errmsg);
+            }
+        });
+    });
 </script>
 
-<!-- Modal cambiar medal -->
-<div id="change_medal_modal" class="modal fade">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header" style="padding-bottom: 5px">
-                <h4></h4>
-            </div>
-            <div class="modal-body">
-                <form id="change_medal" action="/mod/change_badge">
-                    <div class="form-group">
-                        <label>Nueva badge</label>
-                        <input class="form-control" type="text" name="new_medal">
-                        <input class="form-control hidden" type="text" name="iduser">
-                    </div>
-                    <input id="edit_medal" type="submit" class="btn btn-success" style="">
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 
 
 <div class="modal fade" id="change_obs" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">

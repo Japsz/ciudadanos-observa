@@ -151,7 +151,8 @@ exports.obs_monit = function(req, res){
 };
 //Cambiar el Badge de un ciudadano
 exports.upd_medal = function(req, res){
-    if(req.session.isUserLogged && req.session.user.tipo == 1){
+    if((req.session.isUserLogged && req.session.user.tipo == 1) || req.session.isAdminLogged){
+        console.log(req.body);
         req.getConnection(function(err,connection){
             if(err) console.log(err);
             connection.query("UPDATE ciudadano SET medal = ? WHERE iduser = ?",[req.body.medal,req.body.iduser],function(err,obs){

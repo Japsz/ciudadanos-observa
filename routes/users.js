@@ -12,7 +12,7 @@ exports.admin_login = function(req, res){
 
 exports.user_logout = function(req, res){
     req.session.isAdminLogged = false;
-	req.session.isUserLogged = false;
+    req.session.isUserLogged = false;
     req.session.user = 'undefined';
 	res.redirect('/');
 };
@@ -58,7 +58,7 @@ exports.user_login_handler = function(req, res){
                               req.session.isUserLogged = true;
                               console.log(rows);
                               if(nom == null){
-                                  res.redirect("/f_login");
+                                  res.render("/f_login",{data: users[0], obs: rows[0]});
                               } else res.redirect('/indx');
                           });
                           break;

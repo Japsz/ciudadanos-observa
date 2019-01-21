@@ -18,7 +18,10 @@
                                         <div class="input-group" id="fail">
                                             <div id="preview" class="center-block"><img class="img-responsive img-circle" src="<%=data.avatar_pat%>" width="100px" height="100px"></div>
                                             <label>Sube tu Avatar</label>
-                                            <input type="file" name="filetoupload"  onchange="upload(this,'#edit_form')">
+                                            <input type="file" name="filetoupload"  onchange="upload(this,'#edit_form','#mybar2')">
+                                        </div>
+                                        <div class="progress">
+                                            <div id="mybar2" class="progress-bar"></div>
                                         </div>
                                     </form>
                                     <form action="/cdd/edit" method="POST">

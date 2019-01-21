@@ -1,6 +1,9 @@
 /**
  * Created by benja on 26-06-2017.
  */
+
+var send = require('../routes/sendmails'); //Importar la funcion para enviar mail
+
 exports.indx = function(req, res){
     if(req.session.isUserLogged){
         req.getConnection(function(err,connection){
@@ -133,6 +136,7 @@ exports.save = function(req,res){
         req.getConnection(function (err, connection) {
             if(input.tipo == "4"){
                 var embed = require("embed-video");
+                // Crea iframe con el reproductor de video correspondiente (youtube, vimeo, dailymotion)
                 input.tit = embed(input.tit,{attr:{width:"100%",height:536}});
             } else if (input.tipo == "1" && input.tags == "") input.tags = "idea";
             var data = {
@@ -150,74 +154,86 @@ exports.save = function(req,res){
             }
             if(input.idobserva != 'no'){
                 data.idobs = input.idobserva;
+                console.log(input.idobserva);
             }
-            connection.query("INSERT INTO post SET ? ",data, function(err, rows)
-            {
-
-                if (err)
-                    console.log("Error inserting : %s ",err );
+            connection.query("INSERT INTO post SET ? ",data, function(err, rows) {
+                if(err) console.log("Error inserting : %s ",err );
+                // Obtengo los usuarios del observatorio(envia solo si el post es por observatorio) para enviar un correo informando el post
+                if(input.idobserva != 'no'){
+                    connection.query('SELECT user.iduser, observatorio.idobservatorio as idobs, observatorio.nom, username, correo, nombre FROM user'
+                        + ' LEFT JOIN ciudadano ON user.iduser=ciudadano.iduser'
+                        + ' JOIN observatorio ON observatorio.idobservatorio=ciudadano.idobs'
+                        + ' where idobservatorio =' + input.idobserva, function(err, obs) {
+                        if(err) {
+                            console.log("Error Selecting : %s ",err );
+                        } else if(obs.length > 0) {
+                            console.log(obs);
+                            //Variables para envio de correo, data_mail debe tener las mismas variables
+                            var correos = [];
+                            for(var i=0; i<obs.length; i++){
+                                if(obs[i].correo != null){
+                                    correos.push(obs[i].correo);
+                                }
+                            }
+                            var obs = new Array(obs[0].nom, obs[0].idobs); //Envia el nombre del obs y su id para la url
+                            var subj = "Aviso de Observa ciudadania";
+                            var data_mail = {
+                                view: "views\\monitor\\post_notice.ejs", //Path
+                                subject: subj, //Asunto del mensaje
+                                inf: obs, //Array con informacion de observatorio
+                                mails: correos}; //Array de los correos
+                            send.send_mail(data_mail,function(err) {
+                                if(err){
+                                    console.log(err.message);
+                                }
+                            });
+                        }
+                    });
+                }
                 var postid = rows.insertId;
                 if(input.tags != ""){
                     var tags = input.tags.replace(/\s/g,'').split(",");
                     var aux = [];
-                        var query2 = "SELECT * FROM tags WHERE tag = ?";
-                        for(var k = 0 ; k < tags.length;k++){
-                            if(k >= 1){
-                                query2 += " OR tag = ?";
-                            }
-                            aux.push([tags[k]]);
+                    var query2 = "SELECT * FROM tags WHERE tag = ?";
+                    for(var k = 0 ; k < tags.length;k++){
+                        if(k >= 1){
+                            query2 += " OR tag = ?";
                         }
-                        connection.query("INSERT INTO tags (`tag`) VALUES ?",[aux], function(err, nada)
-                        {
-
-                            if (err)
-                                console.log("Error INSERTINg : %s ",err );
-
-                            connection.query(query2,tags, function(err, tags)
-                            {
-
-                                if (err)
-                                    console.log("Error selecting : %s ",err );
-                                console.log(tags);
-                                var query ="INSERT INTO tagpost (`idtag`, `idpost`) VALUES ?";
-                                var list = [];
-                                for(var i = 0; i < tags.length;i++){
-                                    aux =[tags[i].idtag,postid];
-                                    list.push(aux);
-                                }
-                                console.log(input.cat);
-                                if(input.cat != ""){
-                                    list.push([input.cat,postid]);
-                                }
-                                connection.query(query,[list], function(err, rows)
-                                {
-
-                                    if (err)
-                                        console.log("Error inserting : %s ",err );
-                                    res.send("si");
-
-                                });
-
+                        aux.push([tags[k]]);
+                    }
+                    connection.query("INSERT INTO tags (`tag`) VALUES ?",[aux], function(err, nada) {
+                        if (err) console.log("Error INSERTINg : %s ",err );
+                        connection.query(query2,tags, function(err, tags) {
+                            if (err) console.log("Error selecting : %s ",err );
+                            console.log(tags);
+                            var query ="INSERT INTO tagpost (`idtag`, `idpost`) VALUES ?";
+                            var list = [];
+                            for(var i = 0; i < tags.length;i++){
+                                aux =[tags[i].idtag,postid];
+                                list.push(aux);
+                            }
+                            console.log(input.cat);
+                            if(input.cat != ""){
+                                list.push([input.cat,postid]);
+                            }
+                            connection.query(query,[list], function(err, rows) {
+                                if (err) console.log("Error inserting : %s ",err );
+                                res.send("si");
                             });
                         });
+                    });
                 } else {
                     if(input.cat != ""){
-                        connection.query("INSERT INTO tagpost (`idtag`, `idpost`) VALUES ?",[[[input.cat,postid]]], function(err, rows)
-                        {
-
-                            if (err)
-                                console.log("Error inserting : %s ",err );
-
+                        connection.query("INSERT INTO tagpost (`idtag`, `idpost`) VALUES ?",[[[input.cat,postid]]], function(err, rows){
+                            if (err) console.log("Error inserting : %s ",err );
                             res.send("si");
-
                         });
-                    } else
-                    res.send("si");
+                    } else {
+                        res.send("si");
+                    }
                 }
             });
-
             // console.log(query.sql); get raw query
-
         });
     }
     else res.send("no");

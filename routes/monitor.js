@@ -103,7 +103,7 @@ exports.save_cdd = function(req,res){
 
         });
     }
-    else res.send({err:true,errmsg:"ERES UN HACKER MALDITO"});
+    else res.send({err:true,errmsg:"No deberias tener acceso a esta vista :c"});
 };
 //Conseguir la información de un observatorio específico
 exports.get_obs = function(req, res){

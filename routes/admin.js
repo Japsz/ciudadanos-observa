@@ -110,7 +110,7 @@ exports.change_obs = function(req,res){
             });
         })
     } else res.send({err: true,err_msg:"No tienes permisos"});
-}
+};
 
 exports.modproy = function(req,res){
     if(req.session.isAdminLogged){
@@ -299,6 +299,24 @@ exports.save_edit = function(req,res){
 		}
 		else res.redirect('/bad_login');
 };
+
+//Logica editar Badge
+exports.change_badge = function(req,res) {
+    console.log('cambie una badge?');
+    if (req.session.isAdminLogged) {
+        req.getConnection(function (err, connection) {
+            if (err) console.log(err);
+            connection.query("UPDATE ciudadano SET medal = ? WHERE iduser = ?", [req.body.new_medal, req.body.iduser], function (err, obs) {
+                if (err) {
+                    console.log(err);
+                    res.send({err: true, errmsg: "Ocurrió un error al actualizar la información"});
+                } else res.send({err: false, errmsg: "Exito"});
+            });
+        });
+    };
+};
+
+
 //Conseguir csvs cdd
 exports.g_csv_cdd = function(req,res){
     if(req.session.isAdminLogged){

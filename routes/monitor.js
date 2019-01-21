@@ -162,7 +162,7 @@ exports.upd_medal = function(req, res){
             });
         });
     }
-    else res.send({err:true,errmsg:"DEJATE MALDITO JAKER"});
+    else res.send({err:true, errmsg:"DEJATE MALDITO JAKER"});
 };
 exports.drop_cdd = function (req, res) {
     if((req.session.isUserLogged && req.session.user.tipo == 1) || req.session.isAdminLogged){

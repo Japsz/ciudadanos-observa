@@ -35,7 +35,14 @@
             <td><%= data[i].nombre %></td>
             <td><%= data[i].username %></td>
             <td><%= data[i].correo %></td>
-            <td><%= data[i].medal %></td>
+            <td>
+                <%= data[i].medal %>
+                <%if (data[i].tipo == 3){ %>
+                    <button id="medal_edit" type="button" class="btn btn-primary btn-sm" data-name="<%=data[i].username%>" data-iduser="<%=data[i].iduser%>" onclick="medal_modal(this)">
+                        <i class="fa fa-wrench"></i>
+                    </button>
+                <%}%>
+            </td>
             <td><%= new Date(data[i].fnac).toLocaleDateString() %></td>
             <td><%= data[i].post %></td>
             <td><%= data[i].comentarios %></td>
@@ -111,7 +118,39 @@
             }
         })
     }
+
+    function medal_modal(caller) {
+        var medal_modal = $('#change_medal_modal')
+        medal_modal.find('h4').text('Cambiar Medal de '+ $(caller).data('name'));
+        medal_modal.find('#iduser').val($(caller).data('iduser'));
+        medal_modal.modal('toggle');
+    };
+
+
 </script>
+
+<!-- Modal cambiar medal -->
+<div id="change_medal_modal" class="modal fade">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom: 5px">
+                <h4></h4>
+            </div>
+            <div class="modal-body">
+                <form id="change_medal" action="/mod/change_badge">
+                    <div class="form-group">
+                        <label>Nueva badge</label>
+                        <input class="form-control" type="text" name="new_medal">
+                        <input class="form-control hidden" type="text" name="iduser">
+                    </div>
+                    <input id="edit_medal" type="submit" class="btn btn-success" style="">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <div class="modal fade" id="change_obs" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">

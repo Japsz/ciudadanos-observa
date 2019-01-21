@@ -133,6 +133,7 @@ exports.save = function(req,res){
         req.getConnection(function (err, connection) {
             if(input.tipo == "4"){
                 var embed = require("embed-video");
+                // Crea iframe con el reproductor de video correspondiente (youtube, vimeo, dailymotion)
                 input.tit = embed(input.tit,{attr:{width:"100%",height:536}});
             } else if (input.tipo == "1" && input.tags == "") input.tags = "idea";
             var data = {

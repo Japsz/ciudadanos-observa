@@ -119,21 +119,37 @@ exports.save_cdd = function(req,res){
         var generator = require('generate-password');
         // Generar clave alfanumérica
         var pass = generator.generate({length : 7,numbers : true});
-        req.getConnection(function (err, connection) {
-            var data = {
-                nombre     : input.nom,
-                apellido   : input.apellido,
-                username   : input.username,
-                fnac       : input.fnac,
-                password   : pass,
+        var data = {
+                nombre     : '',
+                apellido   : '',
+                username   : '',
+                rut        : '',
+                fnac       : new Date(),
                 tipo       : 3,
+                password   : pass,
                 correo     : input.correo
             };
+        if(input.nom != ''){
+            data.nombre = input.nom;
+        }
+        if(input.apellido != ''){
+            data.apellido = input.apellido;
+        }
+        if(input.username != ''){
+            data.username = input.username;
+        }
+        if(input.rut != ''){
+            data.rut = input.rut;
+        }
+        if(input.fnac != ''){
+            data.fnac = input.fnac;
+        }
+        req.getConnection(function (err, connection) {
             //Verificar si el correo ya está registrado
             connection.query("SELECT * FROM user WHERE correo = ?", input.correo, function(err, rows) {
                 if(err) console.log("Error Selecting correo: %s",err);
                 if(rows.length){
-                    // Si existe, borrarlo de su observatorio y vincularlo al observatorio
+                    // Si existe, borrarlo de su observatorio y vincularlo al observatorio (NO EDITA SUS DATOS DE USUARIO)
                     connection.query("DELETE FROM ciudadano WHERE iduser = " + rows[0].iduser, function(err, r) {
                         if(err) console.log("Error deleting : %s ",err );
                         connection.query("INSERT INTO ciudadano SET ?",{idobs : input.idobs, iduser : rows[0].iduser}, function(err, rowss) {
@@ -149,9 +165,9 @@ exports.save_cdd = function(req,res){
                                             console.log("Error Selecting observatorio: %s",err);
                                         } else {
                                             //Variables para envio de correo, data_mail debe tener las mismas variables
-                                            var info = new Array(obs[0].nom, input.idobs, rows[0].iduser); //Envia el nombre del obs y su id para la url
+                                            var info = new Array(obs[0].nom, input.idobs, rows[0].iduser,true); //Envia el nombre del obs y su id para la url
                                             var mails = new Array(input.correo); //Debe ser array!
-                                            var subj = "Bienvenido a observatorio " + input.nom;
+                                            var subj = "Bienvenido a observatorio de Observa Ciudadanía";
                                             var data_mail = {
                                                 view: "views\\admin\\obs\\save_cdd.ejs", //Path
                                                 subject: subj, //Asunto del mensaje
@@ -185,9 +201,9 @@ exports.save_cdd = function(req,res){
                                         console.log("Error Selecting observatorio: %s",err);
                                     } else {
                                         //Variables para envio de correo, data_mail debe tener las mismas variables
-                                        var info = new Array(obs[0].nom, input.idobs, rows.insertId); //Envia el nombre del obs y su id para la url
+                                        var info = new Array(obs[0].nom, input.idobs, rows.insertId, false); //Envia el nombre del obs, idobs, iduser, usuario existe
                                         var mails = new Array(input.correo); //Debe ser array!
-                                        var subj = "Bienvenido a observatorio " + input.nom;
+                                        var subj = "Bienvenido a observatorio de Observa Ciudadanía";
                                         var data_mail = {
                                             view: "views\\admin\\obs\\save_cdd.ejs", //Path
                                             subject: subj, //Asunto del mensaje

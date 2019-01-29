@@ -358,6 +358,7 @@ exports.save_edit_f = function(req, res){
             tipo : req.session.user.tipo,
             nombre : input.name,
             apellido : input.ape,
+            rut : input.rut,
             fnac : input.fnac,
             gender : input.gend,
             correo : input.correo,

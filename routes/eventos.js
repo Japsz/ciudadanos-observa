@@ -5,12 +5,13 @@ exports.add_evnt = function(req, res){
     }
     else res.redirect('/bad_login');
 };
-//Vista lista de instituciones.
+
+//Vista lista de eventos
 exports.list = function(req, res){
     if(req.session.isAdminLogged){
         req.getConnection(function(err,connection){
 
-            var query = connection.query('SELECT * FROM evento',function(err,rows)
+            var query = connection.query('SELECT * FROM event',function(err,rows)
             {
 
                 if(err)
@@ -24,32 +25,26 @@ exports.list = function(req, res){
     }
     else res.redirect('/bad_login');
 };
+
 //Vista Detalle evento
 exports.obs_list = function(req, res){
     if(req.session.isAdminLogged){
         req.getConnection(function(err,connection){
 
-            connection.query('SELECT observatorio.nom,institucion.nom as instnom, institucion.comuna FROM observatorio LEFT JOIN institucion ON observatorio.idinst = institucion.idinstitucion WHERE observatorio.idevento = ? GROUP BY observatorio.idobservatorio',req.params.id,function(err,rows)
-            {
-
-                if(err)
-                    console.log("Error Selecting : %s ",err );
-
-                connection.query('SELECT evento.*,GROUP_CONCAT(etapa.nombre,"&&",etapa.token) as info FROM evento LEFT JOIN etapa ON etapa.idevento = evento.idevento WHERE evento.idevento = ? GROUP BY evento.idevento',req.params.id,function(err,insts)
-                {
-                    if(err)
-                        console.log("Error Selecting : %s ",err );
-                    if(insts.length){
-                        var list = [];
-                        for(var i = 0;i<insts[0].info.split(",").length;i++){
-                            list.push(insts[0].info.split(",")[i].split("&&"));
-                        }
-                        insts[0].info = list;
-                        res.render('admin/event/event_obs',{page_title:"Observatorios",data:rows,evnt:insts[0], usr:req.session.user});
+            connection.query('SELECT observatorio.nom,institucion.nom as instnom, institucion.comuna FROM observatorio '
+                + ' LEFT JOIN institucion ON observatorio.idinst = institucion.idinstitucion '
+                + ' WHERE observatorio.idevento = ? GROUP BY observatorio.idobservatorio',req.params.id,function(err,rows) {
+                if(err) console.log("Error Selecting : %s ",err );
+                connection.query('SELECT event.nombre as evento, etapas.*, enunciado.enunciado, enunciado.idenunciado, enunciado.archivo FROM etapas'
+                    + ' LEFT JOIN enunciado ON enunciado.idetapa = etapas.idetapa'
+                    + ' LEFT JOIN event ON event.idevento = etapas.idevento'
+                    + ' WHERE etapas.idevento = ? ORDER BY nro ASC',req.params.id,function(err,etapas) {
+                    if(err) console.log("Error Selecting : %s ",err );
+                    console.log(etapas);
+                    if(etapas.length){
+                        res.render('admin/event/event_obs',{page_title:"Observatorios",data:rows, etapa:etapas, usr:req.session.user});
                     } else res.redirect("/bad_login");
-
                 });
-
             });
             //console.log(query.sql);
         });

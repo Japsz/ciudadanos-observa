@@ -1,4 +1,4 @@
-//Vista agregar inst.
+//Vista agregar evento.
 exports.add_evnt = function(req, res){
     if(req.session.isAdminLogged){
         res.render('admin/event/add_evnt',{page_title:"Agregar Evento",usr:req.session.user});
@@ -21,6 +21,16 @@ exports.list = function(req, res){
 
             });
             //console.log(query.sql);
+        });
+    }
+    else res.redirect('/bad_login');
+};
+
+//Editar evento
+exports.edit_event = function(req, res){
+    if(req.session.isAdminLogged){
+        req.getConnection(function(err,connection){
+            // Por terminar
         });
     }
     else res.redirect('/bad_login');
@@ -75,40 +85,42 @@ exports.obstream = function(req, res){
 
 };
 // Logica agregar evento.
-exports.save = function(req,res){
+exports.save_event = function(req,res){
     if(req.session.isAdminLogged){
         var input = JSON.parse(JSON.stringify(req.body));
         req.getConnection(function (err, connection) {
-
-            var inst_data = {
-                etapas : input.etapas,
-                likes : input.likes,
-                nuevos   : input.nuevos,
-                nombre : input.nombre
-            };
-
-            connection.query("INSERT INTO evento SET ? ",inst_data, function(err, rows)
-            {
-
-                if (err)
-                    console.log("Error inserting : %s ",err );
-                var query = "INSERT INTO etapa (`token`,`nro`,`idevento`,`nombre`) VALUES ?";
-                var aux;
-                var list = [];
-                if(inst_data.etapas > 1){
-                    for(var i = 0; i < inst_data.etapas;i++){
-                        aux =[input.texto1[i]+"&&" + input.texto2[i],i+1,rows.insertId,input.noms[i]];
-                        list.push(aux);
+            connection.query('INSERT INTO event (nombre) VALUES (?) ',[input.event],function(err,event){
+                if(err) console.log("Error inserting : %s ",err );
+                var sql = "INSERT INTO etapas (idevento, nro, nombre, likes, nuevos) VALUES ";
+                for(var i=0; i < input.data.length;i++){
+                    sql += "("+ event.insertId + "," + (i+1) + ",'"+ input.data[i][0] + "',"+ input.data[i][1] + ","+ input.data[i][2] +")";
+                    if(i != input.data.length -1){
+                        sql += ",";
                     }
-                } else {
-                    aux =[input.texto1+"&&" + input.texto2,1,rows.insertId,input.noms];
-                    list.push(aux);
                 }
-                connection.query(query,[list],function(err,rows){
-                    res.redirect('/event');
-                })
+                connection.query(sql,function(err, etapas){
+                    if(err) console.log("Error inserting : %s ",err );
+                    var sql2 = "INSERT INTO enunciado (idetapa, enunciado, archivo) VALUES ";
+                    for(var i=0; i < input.data.length; i++){
+                        for(var j=3; j<input.data[i].length; j++){
+                            if(input.data[i][j][1] != 'Escrito'){
+                                sql2 += "("+ (etapas.insertId + i) + ",'" + input.data[i][j][0] + "',"+ 1 +")";
+                            } else {
+                                sql2 += "("+ (etapas.insertId + i) + ",'" + input.data[i][j][0] + "',"+ 0 +")";
+                            }
+                            if(!((j == input.data[i].length -1) && (i == input.data.length -1))){
+                                sql2 += ",";
+                            }
+                        }
+                    }                    
+                    connection.query(sql2,function(err, enunciado){
+                        if(err) console.log("Error inserting : %s ",err );
+                        if(enunciado.insertId){
+                            res.send("ok");
+                        }
+                    });
+                });
             });
-            // console.log(query.sql); get raw query
         });
     }
     else res.redirect('/bad_login');

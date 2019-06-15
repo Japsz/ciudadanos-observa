@@ -3,6 +3,9 @@
     <h2 class="page-header">Evento: <%= etapa[0].evento%> <button class="btn btn-info" style="margin-left: 10px" aria-expanded="false" aria-controls="info" data-toggle="collapse" data-target="#info"><span class="glyphicon glyphicon-info-sign" ></span></button> </h2>
     <div class="collapse" id="info">
         <div class="well">
+            <div class="pull-right">
+                <a class="btn btn-info" href="#">Editar</a>                
+            </div>
             <h3 style="margin:5px">Etapas</h3>
             <table class="table table-responsive table-stripped">
                 <tr>
@@ -41,7 +44,6 @@
                             <%}%>
                             <td style="border-top: <%=new_enun%>px solid #ddd; text-align: center;"><%= etapa[i].likes%></td>
                             <td style="border-top: <%=new_enun%>px solid #ddd; text-align: center;"><%= etapa[i].nuevos%></td>
-                            <td style="border-top: <%=new_enun%>px solid #ddd; text-align: center;"><a class="btn btn-info" href="">Editar</a></td>
                         </tr>
                 <%}%>
                 </tbody>

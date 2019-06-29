@@ -1,94 +1,106 @@
-<table class="table table-responsive table-bordered" id="cdd_table">
-    <thead>
-    <tr>
-        <th>Nombre</th>
-        <th>Nombre usuario</th>
-        <th>Correo</th>
-        <th>Badge</th>
-        <th>Fecha de Nacimiento</th>
-        <th>N° Post</th>
-        <th>N° Coment</th>
-        <th>Genero</th>
-        <th>Observatorio</th>
-        <th>Activo</th>
-    </tr>
-    </thead>
-    <tbody>
-    <% if(data.length){
-        var usrtype;
-        for(var i = 0;i < data.length;i++) {
-            switch(data[i].tipo) {
-                case 1:
-                    usrtype = "Monitor";
-                    break;
-                case 2:
-                    usrtype = "Moderador";
-                    break;
-                case 3:
-                    usrtype = "Ciudadano";
-                    break;
-                default:
-                    usrtype = "notype";
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-responsive table-bordered" id="cdd_table">
+            <thead>
+            <tr>
+                <th style="padding-right: 15px; font-size: 13px">Nombre</th>
+                <th style="padding-right: 15px; font-size: 13px">Nombre usuario</th>
+                <th style="padding-right: 15px; font-size: 13px">Correo</th>
+                <th style="padding-right: 15px; font-size: 13px">Rut</th>
+                <th style="padding-right: 15px; font-size: 13px">Badge</th>
+                <th style="padding-right: 15px; font-size: 13px">Fecha de Nac.</th>
+                <th style="padding-right: 15px; font-size: 13px">Gen</th>
+                <th style="padding-right: 15px; font-size: 13px">Observatorio</th>
+                <th style="padding-right: 15px; font-size: 13px">Activo</th>
+                <th style="padding-right: 15px; font-size: 13px">N° Post</th>
+                <th style="padding-right: 15px; font-size: 13px">N° Coment</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% if(data.length){
+                var usrtype;
+                for(var i = 0;i < data.length;i++) {
+                    switch(data[i].tipo) {
+                        case 1:
+                            usrtype = "Monitor";
+                            break;
+                        case 2:
+                            usrtype = "Moderador";
+                            break;
+                        case 3:
+                            usrtype = "Ciudadano";
+                            break;
+                        default:
+                            usrtype = "notype";
 
-            }%>
-        <tr id="cdd_<%= data[i].iduser%>">
-            <td><%= data[i].nombre %></td>
-            <td><%= data[i].username %></td>
-            <td><%= data[i].correo %></td>
-            <td>
-                <%= data[i].medal %>
-                <%if (data[i].tipo == 3){ %>
-                    <button data-toggle="modal" data-target="#change_medal_modal" class="btn btn-primary btn-sm" data-name="<%=data[i].username%>" data-iduser="<%=data[i].iduser%>" onclick="medal_modal(this)">
-                        <i class="fa fa-wrench"></i>
-                    </button>
-                <%}%>
-            </td>
-            <td><%= new Date(data[i].fnac).toLocaleDateString() %></td>
-            <td><%= data[i].post %></td>
-            <td><%= data[i].comentarios %></td>
-            <td>
-                <%switch(data[i].gender){
-                    case 1:
-                        %>F<%
-                        break;
-                    case 0:%>M<%
-                        break;
-                    default:
-                        %>Otro<%
-                }%>
-            </td>
-            <td style="width: 15%">
-                <% if(data[i].tipo == 3 && data[i].obsinfo != null){%>
-                    <% for(var j = 0;j< data[i].obsinfo.length;j++){%>
-                        <div class="btn-group" style="width:100%" role="group">
-                            <a href="/show_obs/<%=data[i].obsinfo[j][0]%>" class="btn btn-primary" role="button">
-                                <strong><%=data[i].obsinfo[j][1]%></strong>
-                            </a>
-                            <button type="button" onclick="upd_modal_obs(this)" class="btn btn-warning"
-                                    data-target="#change_obs"
-                                    data-toggle="modal"
-                                    data-obs="<%=data[i].obsinfo[j][1]%>"
-                                    data-inst="<%=data[i].obsinfo[j][2]%>"
-                                    data-iduser="<%= data[i].iduser%>"><i class="fa fa-wrench"></i></button>
-                            <a class="btn btn-danger" href="/user/delete/<%= data[i].iduser%>" role="button"><i class="fa fa-minus"></i></a>
+                    }%>
+                <tr id="cdd_<%= data[i].iduser%>">
+                    <td style="padding-right:0; font-size: 13px"><%= data[i].nombre %></td>
+                    <td style="padding-right:0; font-size: 13px"><%= data[i].username %></td>
+                    <td style="max-width: 5%;padding-right:0; font-size: 13px"><%= data[i].correo %></td>
+                    <td style="padding-right:0; font-size: 13px"><%= data[i].rut %></td>
+                    <td style="padding-right:0; font-size: 13px">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <%= data[i].medal%>
+                                <%if (data[i].tipo == 3){ %>
+                                    <button data-toggle="modal" data-target="#change_medal_modal" class="btn btn-primary btn-xs" data-name="<%=data[i].username%>" data-iduser="<%=data[i].iduser%>" onclick="medal_modal(this)">
+                                        <i class="fa fa-wrench"></i>
+                                    </button>
+                                <%}%>                                
+                            </div>
                         </div>
-                     <%}%>
-                <%}%>
-            </td>
-            <% if(parseInt(data[i].fecha_comentario) > 0 || parseInt(data[i].fecha_post) > 0){
-                %><td>Si</td><%
-            } else {
-                %><td class="danger">No</td><%
-            }%>
-        </tr>
-        <%}
-    }else{ %>
-        <tr>
-            <td colspan="10">No existen usuarios para mostrar</td>
-        </tr>
-     <%}%>
-    </tbody>
-</table>
+                    </td>
+                    <td style="padding-right:0; font-size: 13px"><%= new Date(data[i].fnac).toLocaleDateString() %></td>
+                    <td style="padding-right:0; font-size: 13px">
+                        <%switch(data[i].gender){
+                            case 1:
+                                %>F<%
+                                break;
+                            case 0:%>M<%
+                                break;
+                            default:
+                                %>Otro<%
+                        }%>
+                    </td>
+                    <td style="width: 10%; padding-right:0; font-size: 13px">
+                        <% if(data[i].tipo == 3 && data[i].obsinfo != null){%>
+                            <% for(var j = 0;j< data[i].obsinfo.length;j++){%>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <a href="/show_obs/<%=data[i].obsinfo[j][0]%>" class="btn btn-primary btn-xs" role="button">
+                                            <strong><%=data[i].obsinfo[j][1]%></strong>
+                                        </a>
+                                        <button type="button" onclick="upd_modal_obs(this)" class="btn btn-warning btn-xs"
+                                                data-target="#change_obs"
+                                                data-toggle="modal"
+                                                data-obs="<%=data[i].obsinfo[j][1]%>"
+                                                data-inst="<%=data[i].obsinfo[j][2]%>"
+                                                data-iduser="<%= data[i].iduser%>"><i class="fa fa-wrench"></i></button>
+                                        <a class="btn btn-danger btn-xs" href="/user/delete/<%= data[i].iduser%>" role="button"><i class="fa fa-minus"></i></a>                                        
+                                    </div>
+                                </div>
+                             <%}%>
+                        <%}%>
+                    </td>
+                    <% if(parseInt(data[i].fecha_comentario) > 0 || parseInt(data[i].fecha_post) > 0){
+                        %><td style="padding-right:0; font-size: 13px">Si</td><%
+                    } else {
+                        %><td style="padding-right:0; font-size: 13px" class="danger">No</td><%
+                    }%>
+                    <td style="padding-right:0; font-size: 13px"><%= data[i].post %></td>
+                    <td style="padding-right:0; font-size: 13px"><%= data[i].comentarios %></td>
+                </tr>
+                <%}
+            }else{ %>
+                <tr>
+                    <td colspan="10">No existen usuarios para mostrar</td>
+                </tr>
+             <%}%>
+            </tbody>
+        </table>
+    </div>
+</div>
 <!-- Modal cambiar medal -->
 <div id="change_medal_modal" tabindex="-1" role="dialog" class="modal fade">
     <div class="modal-dialog modal-sm" role="document">

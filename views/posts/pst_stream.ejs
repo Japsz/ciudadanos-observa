@@ -16,7 +16,14 @@ for(var i = 0;i<data.length;i++){
             <%}%>
             <div class="blog-post-meta">
                 <input class="hidden" value="<%= data[i].tagz%>" data-id="<%= data[i].idpost%>">
-                <p class="blog-post-date pull-right"><%= f_gen%></p>
+                <p class="blog-post-date pull-right" style="margin-top: -3px"><%= f_gen%></p>
+                <h4 style="margin-right: 3%; margin-top: -3px" class="blog-post-date pull-right"> 
+                    <%if(data[i].nom){%>
+                        Observatorio <%=data[i].nom%>
+                    <%} else{ %>
+                        Todos los observatorios
+                    <%}%>
+                </h4>
             </div>
             <div class="blog-post-content">
                 <%
@@ -121,7 +128,7 @@ for(var i = 0;i<data.length;i++){
         var idpost = "#" + $(this).data('id');
         tagger = tagger.split(",");
         for(var i = 0; i < tagger.length;i++){
-            if(tagger[i] != "null") {
+            if(tagger[i] != "null" && tagger[i]) {
                 tagger[i] = tagger [i].split("@");
                 $(idpost + " .blog-post-meta").append('<a href="/tagbsq/' + tagger[i][1] + '" class="label label-light label-primary">' + tagger[i][0] + '</a> ');
                 $(this).val("");

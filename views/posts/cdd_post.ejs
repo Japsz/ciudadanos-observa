@@ -32,7 +32,14 @@
                                 <%}%>
                                 <div class="blog-post-meta">
                                     <input class="hidden" value="<%= data[i].tagz%>" data-id="<%= data[i].idpost%>">
-                                    <p class="blog-post-date pull-right"><%= f_gen%></p>
+                                    <p class="blog-post-date pull-right" style="margin-top: -3px"><%= f_gen%></p>
+                                    <h4 style="margin-right: 3%; margin-top: -3px" class="blog-post-date pull-right"> 
+                                        <%if(data[i].nom){%>
+                                            Observatorio <%=data[i].nom%>
+                                        <%} else{ %>
+                                            Todos los observatorios
+                                        <%}%>
+                                    </h4>
                                 </div>
                                 <div class="blog-post-content">
                                     <%

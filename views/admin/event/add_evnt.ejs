@@ -1,41 +1,162 @@
 <%- include ../../layouts/admin_header.ejs %>
-    <h3 class="page-header">Crear Evento</h3>
-    <div class="col-md-8 col-md-offset-2">
-        <form class="form" action='/evnt/add' method="POST">
-            <div class=form-group>
-                <label for="nom">Nombre Evento</label>
-                <input type="text" class="form-control" name="nombre" required>
-                <div class="form-inline" style="margin-top: 10px">
-                <label for="nom">N° Etapas</label>
-                <input type="number" class="form-control" name="etapas" onchange="toks(this.value)" onkeyup="toks(this.value)" required>
-                <label for="fono">N° likes/etapa</label>
-                <input type="number" class="form-control" name="likes" required>
-                    <label for="fono">N° nuevos/etapa</label>
-                    <input type="number" class="form-control" name="nuevos" required>
+    
+    <h2 style="margin: 0" class="page-header">Crear Evento</h2>
+
+    <form class="form" id="form_event">
+        <div class="row" style="margin-top: 10px">
+            <div class="col-md-5">
+                <h3 style="margin: 0">Nombre Evento</h3>
+                <div class=form-group>
+                    <input type="text" class="form-control" id="event" required>
                 </div>
             </div>
-            <div class="form-group" id="success">
-            </div>
-            <div class="form-group">
-                <button class="btn btn-lg btn-primary pull-right" id="submit" type="submit">Crear</button>
-            </div>
-        </form>
-    </div>
+        </div>
+        <h3 style="margin: 0">Crear Etapas</h3>
+        <div id="etapas">
+            <div class="well" id="well1">
+                <div class="row">
+                    <div class="form-group col-md-5">
+                        <label>Nombre Etapa 1</label>
+                        <input id="nombre_etapa1" type="text" class="form-control" name="nombre_etapa1" placeholder="Nombre" required>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label>N° de Likes por etapa</label>
+                        <input id="likes1" type="number" min="1" class="form-control" name="likes1" required>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label>N° de Nuevos por etapa</label>
+                        <input id="nuevos1" type="number" min="1" class="form-control" name="nuevos1" required>
+                    </div>
+                    <div class="form-group col-md-1 rmv_etapa hidden">
+                        <label>Eliminar</label>
+                        <a class="btn btn-sm btn-danger" data-idetapa="1" onclick="remove_etapa(this)"><span class="glyphicon glyphicon-remove"></span></a>
+                    </div>
+                </div>
+
+                <table class="table table-responsive table-stripped" style="margin: 0">
+                    <tr>
+                        <th>Enunciados</th>
+                        <th>Tipo</th>
+                        <th style="text-align: center;">Agregar/Quitar</th>
+                    </tr>
+                    <tbody id="enunciados_etapa1">
+                        <tr id="1_1">
+                            <td style="text-align: center;">
+                                <textarea style="height: 35px; max-width: 650px; margin-right: 0; min-width: 650px" id="enunciado1_1" type="text" class="form-control" name="enunciado1_1" required></textarea>
+                            </td>
+                            <td style="text-align: center;">
+                                <select class="form-control" id="tipo_respuesta1_1">
+                                    <option selected>Escrito</option>
+                                    <option>Archivo</option>
+                                </select>
+                            </td>
+                            <td>
+                                <a class="btn btn-sm btn-success" data-idetapa="1" onclick="add_enunciado(this)"><span class="glyphicon glyphicon-plus"></span></a>
+                                <a class="btn btn-sm btn-danger rmv_enunciado hidden" id="rmv1_1" data-idetapa="1" onclick="remove_enunciado(this)"><span class="glyphicon glyphicon-remove"></span></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>           
+        </div>
+        <button class="btn btn-sm btn-primary pull-right" id="submit" type="">Crear</button>
+    </form>
+    <button style="margin-right: 10px" class="btn btn-sm btn-success pull-right" id="add_etapa" onclick="add_etapa()"><span class="glyphicon glyphicon-plus"></span> Agregar Etapa</button>
+
 <script type="text/javascript">
-    function toks(val){
-        $("#success").html("");
-        if(val > 0){
-            $("#submit").attr("disabled",false);
-            for(var i=0;i<val;i++){
-                $("#success").append('<h2 style="margin-top: 20px"> Etapa ' + (i+1) + '</h2>');
-                $("#success").append('<label for="noms">Nombre Etapa</label><input type="text" name="noms" class="form-control">')
-                $("#success").append('<label for="texto1">Pregunta 1</label>\n' + '<input type="text"  class="form-control" name="texto1" required>'
-                    + '<label for="texto2">Pregunta 2</label>\n' + '<input type="text"  class="form-control" name="texto2" required>');
-            }
-        } else {
-            $("#success").append('<h2 style="margin-top: 20px"> Se necesita al menos una etapa</h2>');
-            $("#submit").attr("disabled",true);
-        }
+    //Cantidad de etapas
+    var count_etapas = 1;
+    //Array con la cantidad de enunciados de cada etapa (esta corrido uno atras)
+    var count_enunciados = [1];
+
+    function add_etapa(){
+        count_enunciados[count_etapas] = 1;
+        count_etapas += 1;
+        $(".rmv_etapa").addClass("hidden");
+        var html_etapa = '<div class="well" id="well' + count_etapas + '"><div class="row"><div class="form-group col-md-5">'
+                    +'<label>Nombre Etapa ' + count_etapas + '</label><input id="nombre_etapa' + count_etapas + '" type="text" class="form-control" name="nombre_etapa' + count_etapas + '" placeholder="Nombre" required></div>'
+                    +'<div class="form-group col-md-3"><label>N° de Likes por etapa</label><input id="likes' + count_etapas + '" type="number" min="1" class="form-control" name="likes' + count_etapas + '" required></div>'
+                    +'<div class="form-group col-md-3"><label>N° de Nuevos por etapa</label><input id="nuevos' + count_etapas + '" type="number" min="1" class="form-control" name="nuevos' + count_etapas + '" required></div>'
+                    +'<div class="form-group col-md-1 rmv_etapa"><label>Eliminar</label><a class="btn btn-sm btn-danger" data-idetapa="' + count_etapas + '" onclick="remove_etapa(this)"><span class="glyphicon glyphicon-remove"></span></a></div></div>'
+                    +'<table class="table table-responsive table-stripped" style="margin: 0"><tr><th>Enunciados</th><th>Tipo</th><th style="text-align: center;">Agregar/Quitar</th></tr>'
+                    +'<tbody id="enunciados_etapa' + count_etapas + '"><tr id="' + count_etapas + '_1"><td style="text-align: center;"><textarea style="height: 35px; max-width: 650px; margin-right: 0; min-width: 650px" id="enunciado' + count_etapas + '_1" type="text" class="form-control" name="enunciado' + count_etapas + '_1" required></textarea></td>'
+                    +'<td style="text-align: center;"><select class="form-control" id="tipo_respuesta' + count_etapas + '_1"><option selected>Escrito</option><option>Archivo</option></select></td>'
+                    +'<td><a class="btn btn-sm btn-success" data-idetapa="' + count_etapas + '" onclick="add_enunciado(this)"><span class="glyphicon glyphicon-plus"></span></a>'
+                    +'<a class="btn btn-sm btn-danger rmv_enunciado hidden" id="rmv' + count_etapas + '_1" data-idetapa="' + count_etapas + '" onclick="remove_enunciado(this)"><span class="glyphicon glyphicon-remove"></span></a></td></tr></tbody></table></div>';
+        $("#etapas").append(html_etapa);
+        console.log(count_enunciados);
     }
+
+    function remove_etapa(yo){
+        count_etapas -= 1;
+        count_enunciados[count_etapas] = 0;
+        $("#well" + $(yo).data("idetapa")).remove();
+        $(".rmv_etapa").addClass("hidden");
+        //Muestro el btn eliminar etapa anterior
+        if(count_etapas > 1){
+            $(".rmv_etapa").last().removeClass("hidden");
+        }
+        console.log(count_enunciados);
+    }
+
+    function add_enunciado(yo){
+        var idetapa = $(yo).data("idetapa") - 1;
+        count_enunciados[idetapa] += 1;
+        $("well" + (idetapa + 1) + " > .rmv_enunciado").addClass("hidden");
+        new_idenunciado = idetapa + 1 + '_' + count_enunciados[idetapa];
+        var html_enunciado = '<tr id="' + new_idenunciado + '">'
+            +'<td style="text-align: center;"><textarea style="height: 35px; max-width: 650px; margin-right: 0; min-width: 650px" id="enunciado' + new_idenunciado + '" type="text" class="form-control" name="enunciado' + new_idenunciado + '" required></textarea></td>\n'
+            + '<td style="text-align: center;"><select class="form-control" id="tipo_respuesta' + new_idenunciado + '"><option selected>Escrito</option><option>Archivo</option></select></td>\n'
+            + '<td>\n'
+                +'<a class="btn btn-sm btn-success" data-idetapa="' + (idetapa+1) + '" onclick="add_enunciado(this)"><span class="glyphicon glyphicon-plus"></span></a>\n'
+                +'<a class="btn btn-sm btn-danger rmv_enunciado" id="rmv' + new_idenunciado + '" data-idetapa="' + (idetapa+1) + '" onclick="remove_enunciado(this)"><span class="glyphicon glyphicon-remove"></span></a>\n</td></tr>'
+        $("#enunciados_etapa" + (idetapa+1)).append(html_enunciado);
+    }
+
+    function remove_enunciado(yo){
+        var idetapa = $(yo).data("idetapa") - 1;
+        var idenunciado = "#" + (idetapa+1) + "_" + count_enunciados[idetapa];
+        $(idenunciado).remove();
+        count_enunciados[idetapa] -= 1;
+        //Muestro el btn eliminar, excepto el primero
+        if(count_enunciados[idetapa] > 1){
+            $("#rmv" + (idetapa + 1) + '_' + count_enunciados[idetapa]).removeClass("hidden");
+        }
+        console.log(count_enunciados);
+    }
+
+    $("form#form_event").on('submit', function(e){
+        e.preventDefault();
+        var event = $("#event").val();
+        var data = [];
+        for(var i=0; i<count_etapas; i++){
+            data.push([$("#nombre_etapa"+ (i+1)).val(), 
+                $("#likes"+ (i+1)).val(), 
+                $("#nuevos"+ (i+1)).val()]);
+        }
+        for(var i=0; i<count_etapas; i++){
+            console.log("etapa " + (i + 1));
+            for(var j=0; j < count_enunciados[i]; j++){
+                data[i].push([$("#enunciado"+ (i+1) + "_" + (j+1)).val(),
+                    $("#tipo_respuesta"+ (i+1) + "_" + (j+1)).val()]);
+            }
+        }
+        $.ajax({
+            type: 'POST',
+            data: JSON.stringify({data: data, event: event}),
+            contentType: 'application/json',
+            url: '/evnt/add',
+            success: function(data) {
+                if(data == "ok"){
+                    alert("Evento insertado correctamente.");
+                    window.location.href="/event";
+                } else{
+                    alert("No se ha podido ingresar el evento correctamente.");
+                }
+            }
+        });
+    });
+
 </script>
+
 <%- include ../../layouts/footer.ejs %>

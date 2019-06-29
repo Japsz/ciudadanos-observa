@@ -7,13 +7,16 @@ var send = require('../routes/sendmails'); //Importar la funcion para enviar mai
 exports.indx = function(req, res){
     if(req.session.isUserLogged){
         req.getConnection(function(err,connection){
-
-            connection.query('SELECT COUNT(DISTINCT comentario.idcomentario) as c_count,post.*,user.username,COALESCE(user.avatar_pat,"/assets/img/placeholder.png") AS iconouser,GROUP_CONCAT(DISTINCT tags.tag,"@", tags.idtag ORDER BY tags.tag) AS tagz, COUNT(DISTINCT megusta.iduser) as likes, GROUP_CONCAT(DISTINCT megusta.iduser) as laiktoken FROM' +
-                ' post LEFT JOIN tagpost ON post.idpost = tagpost.idpost LEFT JOIN tags ON tagpost.idtag = tags.idtag INNER JOIN user ON user.iduser = post.iduser' +
-                ' LEFT JOIN megusta ON megusta.idpost = post.idpost LEFT JOIN comentario ON comentario.idpost = post.idpost WHERE post.estado = 2 GROUP BY post.idpost ORDER BY post.fecha DESC LIMIT 6',function(err,rows)
-            {
+            connection.query('SELECT COUNT(DISTINCT comentario.idcomentario) as c_count,post.*,user.username,'
+                + ' COALESCE(user.avatar_pat,"/assets/img/placeholder.png") AS iconouser,'
+                + ' GROUP_CONCAT(DISTINCT tags.tag,"@", tags.idtag ORDER BY tags.tag) AS tagz,'
+                + ' COUNT(DISTINCT megusta.iduser) as likes, GROUP_CONCAT(DISTINCT megusta.iduser) as laiktoken, observatorio.nom FROM post'
+                + ' LEFT JOIN observatorio ON post.idobs=observatorio.idobservatorio'
+                + ' LEFT JOIN tagpost ON post.idpost = tagpost.idpost LEFT JOIN tags ON tagpost.idtag = tags.idtag INNER JOIN user ON user.iduser = post.iduser'
+                + ' LEFT JOIN megusta ON megusta.idpost = post.idpost LEFT JOIN comentario ON comentario.idpost = post.idpost WHERE post.estado = 2 GROUP BY post.idpost ORDER BY post.fecha DESC LIMIT 6',function(err,rows){
                 if(err)
                     console.log("Error Selecting : %s ",err );
+                console.log(rows);
                 res.render('posts/cdd_index',{data :rows, usr:req.session.user, obs: req.session.idobs,stream: "indx",helper: ""});
 
                 //console.log(query.sql);
@@ -28,8 +31,8 @@ exports.indx_stream = function(req, res){
         var wher;
         var render = "posts/";
         var query = 'SELECT post.*, GROUP_CONCAT(DISTINCT megusta.iduser) as laiktoken,COALESCE(user.avatar_pat,"/assets/img/placeholder.png") AS iconouser,user.username,' +
-            'GROUP_CONCAT(DISTINCT tags.tag,"@", tags.idtag ORDER BY tags.tag) AS tagz, COUNT(DISTINCT megusta.iduser) as likes,  COUNT(DISTINCT comentario.idcomentario) as c_count FROM' +
-            ' post LEFT JOIN tagpost ON post.idpost = tagpost.idpost LEFT JOIN comentario ON comentario.idpost = post.idpost LEFT JOIN tags ON tagpost.idtag = tags.idtag INNER JOIN user ON user.iduser = post.iduser' +
+            'GROUP_CONCAT(DISTINCT tags.tag,"@", tags.idtag ORDER BY tags.tag) AS tagz, COUNT(DISTINCT megusta.iduser) as likes,  COUNT(DISTINCT comentario.idcomentario) as c_count, observatorio.nom FROM' +
+            ' post LEFT JOIN observatorio ON post.idobs=observatorio.idobservatorio LEFT JOIN tagpost ON post.idpost = tagpost.idpost LEFT JOIN comentario ON comentario.idpost = post.idpost LEFT JOIN tags ON tagpost.idtag = tags.idtag INNER JOIN user ON user.iduser = post.iduser' +
             ' LEFT JOIN megusta ON megusta.idpost = post.idpost WHERE post.fecha < ? ';
         switch(input.strim){
             case "indx":
@@ -322,14 +325,19 @@ exports.p_edit = function(req, res){
         });
     } else res.redirect('/bad_login');
 };
+
 exports.usr_post = function(req, res){
     if(req.session.isUserLogged){
         req.getConnection(function(err,connection){
 
-            connection.query('SELECT post.*,user.username,user.avatar_pat AS iconouser' +
-                ',GROUP_CONCAT(DISTINCT tags.tag,"@", tags.idtag ORDER BY tags.tag) AS tagz,GROUP_CONCAT(DISTINCT megusta.iduser) as laiktoken, COUNT(DISTINCT megusta.iduser) as likes FROM' +
-                ' post LEFT JOIN tagpost ON post.idpost = tagpost.idpost LEFT JOIN tags ON tagpost.idtag = tags.idtag INNER JOIN user ON user.iduser = post.iduser' +
-                ' LEFT JOIN megusta ON megusta.idpost = post.idpost WHERE post.iduser = ? GROUP BY post.idpost ORDER BY post.fecha DESC LIMIT 6',req.session.user.iduser,function(err,rows)
+            connection.query('SELECT post.*,user.username,user.avatar_pat AS iconouser,'
+                + ' GROUP_CONCAT(DISTINCT tags.tag,"@", tags.idtag ORDER BY tags.tag) AS tagz,'
+                + ' GROUP_CONCAT(DISTINCT megusta.iduser) as laiktoken, COUNT(DISTINCT megusta.iduser) as likes, observatorio.nom FROM post'
+                + ' LEFT JOIN observatorio ON post.idobs=observatorio.idobservatorio'
+                + ' LEFT JOIN tagpost ON post.idpost = tagpost.idpost'
+                + ' LEFT JOIN tags ON tagpost.idtag = tags.idtag'
+                + ' INNER JOIN user ON user.iduser = post.iduser'
+                + ' LEFT JOIN megusta ON megusta.idpost = post.idpost WHERE post.iduser = ? GROUP BY post.idpost ORDER BY post.fecha DESC LIMIT 6',req.session.user.iduser,function(err,rows)
             {
                 if(err)
                     console.log("Error Selecting : %s ",err );
@@ -339,6 +347,7 @@ exports.usr_post = function(req, res){
         });
     } else res.redirect('/bad_login');
 };
+
 exports.rm_post = function (req, res) {
     if(req.session.isUserLogged){
         req.getConnection(function (err, connection) {

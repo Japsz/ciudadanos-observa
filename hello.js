@@ -63,7 +63,7 @@ app.use(
 
         host: '127.0.0.1',
         user: 'root',
-        password : '1234',
+        password : 'observaproyecta',
         port : 3306,
         database:'Observapp'
 
@@ -89,7 +89,8 @@ app.post("/csv_proy",admin.g_csv_proy);
 
 app.get('/event', event.list);
 app.get('/add_event', event.add_evnt);
-app.post('/evnt/add', event.save);
+app.post('/edit_event', event.edit_event);
+app.post('/evnt/add', event.save_event);
 app.get('/evnt/:id', event.obs_list);
 app.post('/obs_stream', event.obstream);
 app.post('/addto_evnt', event.addto_evnt);

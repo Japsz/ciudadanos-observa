@@ -1,11 +1,11 @@
-//Vista agregar inst.
+//Vista agregar evento.
 exports.add_evnt = function(req, res){
     if(req.session.isAdminLogged){
         res.render('admin/event/add_evnt',{page_title:"Agregar Evento",usr:req.session.user});
     }
     else res.redirect('/bad_login');
 };
-//Vista lista de instituciones.
+//Vista lista de EVENTIS.
 exports.list = function(req, res){
     if(req.session.isAdminLogged){
         req.getConnection(function(err,connection){

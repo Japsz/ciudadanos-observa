@@ -1,6 +1,7 @@
 var express = require('express');
 var routes = require('./routes/index');
 var http = require('http');
+var proxy = require('http-proxy').createProxyServer({});
 var path = require('path');
 
 var app = express(), mailer = require("express-mailer");
@@ -8,6 +9,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var cookieSession = require('cookie-session');
 var bodyParser = require('body-parser');
+var formidable =require('formidable');
 
 var users = require('./routes/users');
 var observ = require('./routes/observatorio');
@@ -170,6 +172,11 @@ app.get('/bad_login', users.bad_login);
 app.post('/admin_login_handler', users.admin_login_handler);
 app.post('/user_login_handler', users.user_login_handler);
 
+app.use('/lab',function(req,res){
+    proxy.web(req, res, {
+        target: 'http://127.0.0.1:8081'
+    });
+});
 // stats ajax
 app.get('/get_stats', function(req,res){
     req.getConnection(function(err,connection){
@@ -198,24 +205,7 @@ app.get('/get_stats', function(req,res){
         });
     });
 });
-        // console.log("No entiendo mucho que pasa.");
-        // if(err) throw err;
-        // connection.query("SELECT COUNT (*) FROM user WHERE tipo = 3",function(err,rows){
-        //     if(err) throw err;
-        //     connection.query("SELECT COUNT (*) FROM instituciones",function(err,rows){
-        //         if(err) throw err;
-        //         connection.query("SELECT * FROM instituciones",function(err,rows){
-        //             if(err) throw err;
 
-        //             connection.query("SELECT * FROM instituciones",function(err,rows){
-        //                 if(err) throw err;
-
-        //                 res.send('HELLO');
-        //             });
-        //         });
-        //     });
-        // });
-    
 app.post('/subir_pic', function (req,res) {
     var f_gen = new Date();
     var newname = "user" + req.session.user.iduser.toString() + "-" + f_gen.getTime() + ".jpg";
@@ -224,7 +214,29 @@ app.post('/subir_pic', function (req,res) {
     req.files.filetoupload.mv(newpath);
     res.send("/web-img/" + newname);
 });
-
+app.post('/subir_file', function (req,res) {
+    var f_gen = new Date();
+    var newname = "user" + req.session.user.iduser.toString() + "-" + f_gen.getTime() + ".jpg";
+    var form = new formidable.IncomingForm();
+    form.parse(req, function (err, fields, files) {
+        if (err){
+            console.log(err);
+            res.send({err:true,errMsg:err});
+        } else {
+            console.log(files['file-0']);
+            var oldpath = files['file-0'].path;
+            var newpath = './public/web-img/wena-' + newname;
+            fs.rename(oldpath, newpath, function (err) {
+                if (err){
+                    console.log(err);
+                    res.send({err:true,errMsg:err});
+                } else {
+                    res.send({err:false,savedpath:"/web-img/" + newname});
+                }
+            });
+        }
+    });
+});
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;

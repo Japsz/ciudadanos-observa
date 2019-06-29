@@ -63,7 +63,7 @@ app.use(
 
         host: '127.0.0.1',
         user: 'root',
-        password : 'observaproyecta',
+        password : '1234',
         port : 3306,
         database:'Observapp'
 

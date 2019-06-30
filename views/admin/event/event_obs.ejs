@@ -4,18 +4,17 @@
     <div class="collapse" id="info">
         <div class="well">
             <div class="pull-right">
-                <a class="btn btn-info" href="#">Editar</a>                
+                <a class="btn btn-success" href="/edit_event/<%=etapa[0].idevento%>"><span class="glyphicon glyphicon-pencil"></span> Editar</a>                
             </div>
             <h3 style="margin:5px">Etapas</h3>
             <table class="table table-responsive table-stripped">
                 <tr>
                     <th>Orden</th>
                     <th>Nombre</th>
-                    <th>Enunciado</th>
-                    <th>Respuesta</th> 
                     <th>Likes</th>
                     <th>Nuevos</th>
-                    <th>Acción</th>
+                    <th>Enunciado</th>
+                    <th>Respuesta</th> 
                 </tr>
                 <tbody id="etapas">
                 <%
@@ -29,9 +28,13 @@
                         <tr id="<%=etapa[i].idenunciado%>">
                             <th><%= etapa[i].nro%></th>
                             <td><%= etapa[i].nombre%></td>
+                            <td style="border-top: <%=new_enun%>px solid #ddd; text-align: center;"><%= etapa[i].likes%></td>
+                            <td style="border-top: <%=new_enun%>px solid #ddd; text-align: center;"><%= etapa[i].nuevos%></td>
                     <%} else {
                         new_enun = 0;%>
                         <tr id="<%=etapa[i].idenunciado%>">
+                            <td style="border-top: <%=new_enun%>px solid #ddd; text-align: center;"></td>
+                            <td style="border-top: <%=new_enun%>px solid #ddd; text-align: center;"></td>
                             <td style="border-top: <%=new_enun%>px solid #ddd; text-align: center;"></td>
                             <td style="border-top: <%=new_enun%>px solid #ddd; text-align: center;"></td>
                     <%}%>
@@ -42,8 +45,6 @@
                             <%} else {%>
                                 <td style="border-top: <%=new_enun%>px solid #ddd; text-align: center;">Texto</td>
                             <%}%>
-                            <td style="border-top: <%=new_enun%>px solid #ddd; text-align: center;"><%= etapa[i].likes%></td>
-                            <td style="border-top: <%=new_enun%>px solid #ddd; text-align: center;"><%= etapa[i].nuevos%></td>
                         </tr>
                 <%}%>
                 </tbody>
@@ -129,6 +130,7 @@
         </div>
     </div>
 </div>
+
 <script>
     function strim() {
         var nom = document.getElementsByName("nom")[0].value;

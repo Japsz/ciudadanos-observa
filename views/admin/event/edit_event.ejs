@@ -198,10 +198,10 @@
             success: function(data) {
                 if(data == "ok"){
                     alert("Evento actualizado correctamente.");
-                    window.location.href="/edit_event/" + idevento;
                 } else{
-                    alert("No se ha podido ingresar el evento correctamente.");
+                    alert(data);
                 }
+                window.location.href="/edit_event/" + idevento;
             }
         });
     });

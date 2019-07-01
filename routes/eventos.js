@@ -73,6 +73,9 @@ exports.edit_event = function(req, res){
 exports.save_edit_event = function(req,res){
     if(req.session.isAdminLogged){
         var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
+        console.log(input.data);
+        var msj_res = "";
         //           Eliminar etapas          //
         var delete_etapa = [];
         for(var i=0; i<input.ilist_etap.length; i++){
@@ -97,10 +100,16 @@ exports.save_edit_event = function(req,res){
             console.log(delete_etapa_sql);
             req.getConnection(function (err, connection) {
                 connection.query(delete_etapa_sql, function(err, enunciados){
-                    if(err) console.log("Error deleting enunciado : %s ",err );
+                    if(err){
+                        console.log("Error deleting enunciado : %s ",err );
+                        msj_res += "No se pueden eliminar enunciados que tienen respuestas.";
+                    }
                     console.log(delete_etapa_sql2);
                     connection.query(delete_etapa_sql2, function(err, etapas){
-                        if(err) console.log("Error deleting etapa : %s ",err );
+                        if(err){
+                            console.log("Error deleting etapa : %s ",err );
+                            msj_res += "No se pueden eliminar etapas que tienen respuestas de enunciado.";
+                        }
                     });
                 });
             });
@@ -132,11 +141,11 @@ exports.save_edit_event = function(req,res){
                     }
                     // Insertar enunciados de nuevas etapas
                     var insert_enunciado_sql = "INSERT INTO enunciado (idetapa, enunciado, archivo) VALUES ";
-                    var new_enun_etapa = false;
+                    var new_enun_etapa = [];
                     for(var i=0; i<input.elist_etap.length; i++){
                         if(input.elist_etap[i] == 0){
                             for(var j=3; j<input.data[i].length; j++){
-                                if(j != 3 && new_enun_etapa){
+                                if(new_enun_etapa,length > 0){
                                     insert_enunciado_sql += ",";
                                 }
                                 if(input.data[i][j][1] != 'Escrito'){
@@ -144,7 +153,7 @@ exports.save_edit_event = function(req,res){
                                 } else {
                                     insert_enunciado_sql += "("+ input.elist_enun[i][0] + ",'" + input.data[i][j][0] + "',"+ 0 +")";
                                 }
-                                new_enun_etapa = true;
+                                new_enun_etapa.push(input.elist_enun[i][0]);
                             }
                         }
                     }
@@ -183,12 +192,15 @@ exports.save_edit_event = function(req,res){
             console.log(update_delete_sql);
             req.getConnection(function (err, connection) {
                 connection.query(update_delete_sql, function(err, enunciados){
-                    if(err) console.log("Error deleting enunciado: %s ",err );
+                    if(err){
+                        console.log("Error deleting enunciado: %s ",err );
+                        msj_res += "No se pueden eliminar enunciados que tienen respuestas.";
+                    }
                 });
             });
         }
         // Insertar enunciados nuevos de etapas existentes
-        var new_enun = false;
+        var new_enun = [];
         var update_insert_sql = "INSERT INTO enunciado (idetapa, enunciado, archivo) VALUES ";
         for(var i=0; i<input.elist_etap.length; i++){
             // Si ya existia esta etapa, se actualiza
@@ -197,7 +209,7 @@ exports.save_edit_event = function(req,res){
                 if(input.elist_etap[i] != 0){ // Si no es una etapa nueva
                     for(var j=3; j<input.data[i].length; j++){
                         if(input.data[i][j][2] == 0){
-                            if(j != 3 && new_enun){
+                            if(new_enun.length > 0){
                                 update_insert_sql += ",";
                             }
                             if(input.data[i][j][1] != 'Escrito'){
@@ -205,13 +217,13 @@ exports.save_edit_event = function(req,res){
                             } else {
                                 update_insert_sql += "("+ input.elist_etap[i] + ",'" + input.data[i][j][0] + "',"+ 0 +")";
                             }
-                            new_enun = true;
+                            new_enun.push(input.elist_etap[i]);
                         }
                     }
                 }
             }
         }
-        if(new_enun){ // REVISAR
+        if(new_enun.length > 0){
             console.log(update_insert_sql);
             req.getConnection(function (err, connection) {
                 connection.query(update_insert_sql, function(err, etapas){
@@ -219,8 +231,6 @@ exports.save_edit_event = function(req,res){
                 });
             });
         }
-        console.log(input);
-        console.log(input.data);
         // Actualizar evento, etapas y enunciados
         var evento = {
             nombre : input.event
@@ -243,12 +253,12 @@ exports.save_edit_event = function(req,res){
                 connection.query(update_etapas_sql, function(err, rows){
                     if (err) console.log("Error updating etapas: %s ",err );
                     var update_enunciados_sql = "INSERT INTO enunciado (idenunciado, idetapa, enunciado, archivo) VALUES ";
-                    var update_enun = false;
+                    var update_enun = [];
                     for(var i=0; i<input.elist_etap.length; i++){
                         if(input.elist_etap[i] != 0){
                             for(var j=3; j<input.data[i].length; j++){
                                 if(input.data[i][j][2] != 0){
-                                    if(j != 3 && update_enun){
+                                    if(update_enun.length > 0){
                                         update_enunciados_sql += ",";
                                     }
                                     if(input.data[i][j][1] != 'Escrito'){
@@ -256,7 +266,7 @@ exports.save_edit_event = function(req,res){
                                     } else{
                                         update_enunciados_sql += "(" + input.data[i][j][2] + "," + input.elist_etap[i] + ",'" + input.data[i][j][0] + "'," + 0 + ")";
                                     }
-                                    update_enun = true;
+                                    update_enun.push(input.data[i][j][2]);
                                 }
                             }
                         }
@@ -265,7 +275,11 @@ exports.save_edit_event = function(req,res){
                     console.log(update_enunciados_sql);
                     connection.query(update_enunciados_sql, function(err, rows){
                         if (err) console.log("Error updating enunciados: %s ",err );
-                        res.send("ok");
+                        if(msj_res == ""){
+                            res.send("ok");
+                        } else{
+                            res.send(msj_res);
+                        }
                     });
                 });
             });
@@ -407,6 +421,22 @@ exports.addto_evnt = function(req,res){
                 });
             });
             // console.log(query.sql); get raw query
+        });
+    }
+    else res.redirect('/bad_login');
+};
+
+//Eliminar evento
+exports.delete_event = function(req, res){
+    if(req.session.isAdminLogged){
+        req.getConnection(function(err,connection){
+            connection.query("UPDATE observatorio SET idevento = ? WHERE idevento = ?",[1, req.params.idevent], function(err, rows){
+                if (err) console.log("Error updating observatorio: %s ",err );
+                connection.query('SELECT * FROM event',function(err,rows){
+                    if(err) console.log("Error Selecting : %s ",err );
+                    res.render('admin/event/event_list',{page_title:"Eventos",data:rows, usr:req.session.user});
+                });
+            });
         });
     }
     else res.redirect('/bad_login');

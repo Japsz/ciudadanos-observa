@@ -93,6 +93,7 @@ app.post('/evnt/add', event.save_event);
 app.get('/evnt/:id', event.obs_list);
 app.post('/obs_stream', event.obstream);
 app.post('/addto_evnt', event.addto_evnt);
+app.get('/delete_event/:idevent', event.delete_event);
 
 // Monitor y Moderador
 

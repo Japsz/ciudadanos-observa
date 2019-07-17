@@ -39,7 +39,7 @@ exports.edit_event = function(req, res){
                     connection.query('SELECT event.idevento, event.nombre as evento, etapas.*, enunciado.enunciado, enunciado.idenunciado, enunciado.archivo FROM etapas'
                     + ' LEFT JOIN enunciado ON enunciado.idetapa = etapas.idetapa'
                     + ' LEFT JOIN event ON event.idevento = etapas.idevento'
-                    + ' WHERE etapas.idevento = ? ORDER BY nro ASC', req.params.idevent, function(err, data) {
+                    + ' WHERE etapas.idevento = ? ORDER BY nro,idenunciado ASC', req.params.idevent, function(err, data) {
                     if(err) console.log("Error Selecting : %s ",err );
                     var enunciados = "";
                     for(var i=0; i<evento.length; i++){
@@ -72,9 +72,7 @@ exports.edit_event = function(req, res){
 // Logica editar evento.
 exports.save_edit_event = function(req,res){
     if(req.session.isAdminLogged){
-        var input = JSON.parse(JSON.stringify(req.body));
-        console.log(input);
-        console.log(input.data);
+        var input = JSON.parse(JSON.stringify(req.body));        
         var msj_res = "";
         //           Eliminar etapas          //
         var delete_etapa = [];
@@ -145,7 +143,7 @@ exports.save_edit_event = function(req,res){
                     for(var i=0; i<input.elist_etap.length; i++){
                         if(input.elist_etap[i] == 0){
                             for(var j=3; j<input.data[i].length; j++){
-                                if(new_enun_etapa,length > 0){
+                                if(new_enun_etapa.length > 0){
                                     insert_enunciado_sql += ",";
                                 }
                                 if(input.data[i][j][1] != 'Escrito'){

@@ -10,7 +10,7 @@ var cookieParser = require('cookie-parser');
 var cookieSession = require('cookie-session');
 var bodyParser = require('body-parser');
 var formidable =require('formidable');
-
+var fs = require('fs');
 var users = require('./routes/users');
 var observ = require('./routes/observatorio');
 var event = require('./routes/eventos');
@@ -27,7 +27,7 @@ mailer.extend(app, {
     transportMethod: 'SMTP', // default is SMTP. Accepts anything that nodemailer accepts
     auth: {
         user: 'observaciudadania17@gmail.com',
-        pass: 'proyectaobserva'
+        pass: 'observa2020'
     }
 });
 
@@ -58,17 +58,13 @@ app.use(expressFU({
 }));
 
 app.use(
-
     connection(mysql,{
-
         host: '127.0.0.1',
         user: 'root',
         password : 'observaproyecta',
         port : 3306,
         database:'Observapp'
-
     },'pool')
-
 );
 
 app.get('/', routes.index);
@@ -175,7 +171,7 @@ app.post('/user_login_handler', users.user_login_handler);
 
 app.use('/lab',function(req,res){
     proxy.web(req, res, {
-        target: 'http://127.0.0.1:8081'
+        target: 'http://localhost:8081'
     });
 });
 // stats ajax
@@ -215,29 +211,7 @@ app.post('/subir_pic', function (req,res) {
     req.files.filetoupload.mv(newpath);
     res.send("/web-img/" + newname);
 });
-app.post('/subir_file', function (req,res) {
-    var f_gen = new Date();
-    var newname = "user" + req.session.user.iduser.toString() + "-" + f_gen.getTime() + ".jpg";
-    var form = new formidable.IncomingForm();
-    form.parse(req, function (err, fields, files) {
-        if (err){
-            console.log(err);
-            res.send({err:true,errMsg:err});
-        } else {
-            console.log(files['file-0']);
-            var oldpath = files['file-0'].path;
-            var newpath = './public/web-img/wena-' + newname;
-            fs.rename(oldpath, newpath, function (err) {
-                if (err){
-                    console.log(err);
-                    res.send({err:true,errMsg:err});
-                } else {
-                    res.send({err:false,savedpath:"/web-img/" + newname});
-                }
-            });
-        }
-    });
-});
+
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
@@ -261,4 +235,3 @@ server.listen(app.get('port'), function(){
     console.log('The game starts on port ' + app.get('port'));
 });
 
-const io = require('socket.io')(server);

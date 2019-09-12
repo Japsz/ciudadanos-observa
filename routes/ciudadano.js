@@ -154,10 +154,10 @@ exports.intern_laik = function (req, res) {
                                                         // handle error
                                                         console.log(err);
                                                         res.send('There was an error sending the email');
-                                                        return;
+                                                    } else {
+                                                        res.send('Success');
                                                     }
                                                 });
-
                                             });
                                         });
                                     }

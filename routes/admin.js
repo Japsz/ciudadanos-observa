@@ -231,91 +231,79 @@ exports.save_cdd = function(req,res){
 exports.modproy = function(req,res){
     if(req.session.isAdminLogged){
         req.getConnection(function(err,connection){
-            connection.query('SELECT postinterno.*,proyecto.titulo,user.username,user.avatar_pat as iconouser FROM postinterno LEFT JOIN proyecto ON proyecto.idproyecto = postinterno.idproyecto LEFT JOIN user ON user.iduser = postinterno.iduser WHERE postinterno.tipo = 0 GROUP BY postinterno.idpostinterno',function(err,rows)
-            {
-
-                if(err)
-                    console.log("Error Selecting : %s ",err );
+            connection.query("SELECT avance.*,GROUP_CONCAT(DISTINCT enunciado.enunciado,'@@',enunciado.archivo,'@@',respuesta.contenido SEPARATOR '&&') AS ansToken" +
+              " ,GROUP_CONCAT(DISTINCT user.username,'@@',COALESCE(user.avatar_pat,'/assets/img/placeholder.png')) AS userToken,etapas.nro," +
+              " proyecto.*" +
+              " FROM avance" +
+              " LEFT JOIN respuesta ON respuesta.idavance = avance.idavance" +
+              " LEFT JOIN enunciado ON enunciado.idenunciado = respuesta.idenunciado" +
+              " LEFT JOIN user ON user.iduser = avance.iduser" +
+              " LEFT JOIN proyecto ON proyecto.idproyecto = avance.idproyecto" +
+              " LEFT JOIN etapas ON etapas.idetapa = enunciado.idetapa" +
+              " WHERE avance.estado = 'pendiente' GROUP BY avance.idavance ORDER BY avance.fecha DESC",function(err,rows){
+              if(err){
+                console.log(err);
+                res.sendStatus(500);
+              } else {
                 if(rows.length){
-                	for(var i = 0;i<rows.length;i++){
-                		rows[i].token = rows[i].token.split("&&");
-					}
-				}
+                  var arrayAux
+                  var objAux
+                  rows = rows.map(function(val){
+                    objAux = val
+                    arrayAux = val.ansToken.split('&&').map(function(string){
+                      string = string.split("@@");
+                      return string;
+                    });
+                    objAux.userToken = val.userToken.split('@@')
+                    objAux.ansToken = arrayAux
+                    return objAux;
+                  });
+                }
                 res.render('admin/event/modproys',{page_title:"Stats",data:rows, usr:req.session.user});
-
+              }
             });
-            //console.log(query.sql);
         });
-    }
-    else res.redirect('/bad_login');
+    } else res.redirect('/bad_login');
 };
 exports.moderate_p = function(req,res){
     if(req.session.isAdminLogged){
         var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input)
         req.getConnection(function(err,connection){
-        	if(input.resp == "si"){
-        		connection.query("UPDATE postinterno SET tipo = 4 WHERE idpostinterno = ?",input.idpost,function(err,rows){
+        	if(input.resp === "si"){
+        		connection.query("UPDATE avance SET estado = 'aprobado' WHERE idavance = ?",input.idpost,function(err,rows){
         			if(err) console.log("Error Updating1 : %s ",err);
-        			connection.query("UPDATE proyecto SET gotlaik = 0, gotuser = 0, etapa = (etapa + 1) WHERE idproyecto = (SELECT idproyecto FROM postinterno WHERE idpostinterno = ?)",input.idpost,function(err,rows){
-                        if(err) console.log("Error Updating2 : %s ",err);
-                        connection.query("UPDATE postinterno SET tipo = 5 WHERE idproyecto = (SELECT idproyecto FROM postinterno WHERE idpostinterno = ?) AND tipo = 0",input.idpost,function(err,rows){
-                            if(err) console.log("Error Updating3 : %s ",err);
-                            connection.query("SELECT postinterno.*,proyecto.titulo,user.correo FROM postinterno LEFT JOIN proyecto ON proyecto.idproyecto = postinterno.idproyecto" +
-								" LEFT JOIN user ON user.iduser = proyecto.idcreador WHERE postinterno.idpostinterno = ? GROUP BY postinterno.idpostinterno",input.idpost,function(err,rows){
-                                if(err) console.log("Error SELECTING : %s ",err);
-								if(rows.length){
-                                    var newuser_act = {
-                                        iduser: rows[0].iduser,
-                                        idproyecto: rows[0].idproyecto,
-                                        tipo : 5,
-                                        principal : "El proyecto avanzó de etapa!",
-                                        contenido: '<h4>' + rows[0].token.split("&&")[0] + '</h4>' + rows[0].texto1 +'<hr style="border-top-color: black; margin-top: 20px"><h4>' + rows[0].token.split("&&")[1] + '</h4>' + rows[0].texto2,
-                                        fecha: new Date()
-                                    };
-                                    rows[0].token = rows[0].token.split("&&");
-                                    connection.query("INSERT INTO actualizacion SET ?",newuser_act,function (err,rows){
-                                        if(err) console.log("Error INSERTING : %s ",err);
-                                        res.redirect("/mod_proys");
-                                    });
-                                    res.mailer.send('mail_avance', {
-                                        to: rows[0].correo, // REQUIRED. This can be a comma delimited string just like a normal email to field.
-                                        subject: 'El avance de tu proyecto fue aprobado', // REQUIRED.
-                                        data: rows[0],
-                                        estado: "aprobado"// All additional properties are also passed to the template as local variables.
-                                    }, function (err) {
-                                        if (err) {
-                                            // handle error
-                                            console.log(err);
-                                            res.send('There was an error sending the email');
-                                        }
-                                        return;
-                                    });
-                                }
-							});
-						});
-					});
-				});
+        			connection.query("UPDATE proyecto SET gotlaik = 0, gotuser = 0, etapa = (etapa + 1) WHERE idproyecto = ?",input.idproyecto,function(err,rows){
+                  if(err) console.log("Error Updating2 : %s ",err);
+                  connection.query("UPDATE avance SET estado = 'antiguo' WHERE idproyecto = ? AND estado = ('pendiente', 'preaprobado', 'propuesto')", input.idproyecto, function(err, rows) {
+                    if(err) console.log(err)
+                    connection.query("SELECT avance.*,proyecto.titulo,user.correo FROM avance LEFT JOIN proyecto ON proyecto.idproyecto = avance.idproyecto" +
+                      " LEFT JOIN user ON user.iduser = proyecto.idcreador WHERE avance.idavance = ? GROUP BY avance.idavance",input.idpost,function(err,rows){
+                      if(err) console.log("Error SELECTING : %s ",err);
+                      if(rows.length){
+                        var newuser_act = {
+                          iduser: rows[0].iduser,
+                          idproyecto: rows[0].idproyecto,
+                          tipo : 5,
+                          principal : "El proyecto avanzó de etapa!",
+                          contenido:  rows[0].idavance,
+                        };
+                        connection.query("INSERT INTO actualizacion SET ?",newuser_act,function (err,rows){
+                          if(err) console.log("Error INSERTING : %s ",err);
+                          res.redirect("/mod_proys");
+                        });
+                      }
+                    });
+                  })
+               });
+          });
 			} else if(input.resp == "no"){
-        		connection.query("UPDATE postinterno SET tipo = 5 WHERE idpostinterno = ?",input.idpost,function(err,rows){
+        		connection.query("UPDATE avance SET estado = 'rechazado' WHERE idavance = ?",input.idpost,function(err,rows){
                     if(err) console.log("Error Updating : %s ",err);
-                    connection.query("SELECT postinterno.*,proyecto.titulo,user.correo FROM postinterno LEFT JOIN proyecto ON proyecto.idproyecto = postinterno.idproyecto" +
-                        " LEFT JOIN user ON user.iduser = proyecto.idcreador WHERE postinterno.idpostinterno = ? GROUP BY postinterno.idpostinterno",input.idpost,function(err,rows) {
+                    connection.query("SELECT avance.*,proyecto.titulo,user.correo FROM avance LEFT JOIN proyecto ON proyecto.idproyecto = avance.idproyecto" +
+                      " LEFT JOIN user ON user.iduser = proyecto.idcreador WHERE avance.idavance = ? GROUP BY avance.idavance",input.idpost,function(err,rows) {
                         if (err) console.log("Error SELECTING : %s ", err);
                         res.redirect("/mod_proys");
-                        res.mailer.send('mail_avance', {
-                            to: rows[0].correo, // REQUIRED. This can be a comma delimited string just like a normal email to field.
-                            subject: 'El avance de tu proyecto fue rechazado', // REQUIRED.
-                            data: rows[0],
-							comm: input.comment,
-                            estado: "rechazado"// All additional properties are also passed to the template as local variables.
-                        }, function (err) {
-                            if (err) {
-                                // handle error
-                                console.log(err);
-                                res.send('There was an error sending the email');
-                                return;
-                            }
-                        });
                     });
 				});
 			} else

@@ -1,5 +1,16 @@
 <%- include ../../layouts/admin_header.ejs %>
 <h2 class="page-header">Moderar Avances de proyectos</h2>
+<style>
+    .addSol{
+        display: inline;
+        cursor: pointer;
+        font-size: medium;
+        margin: 0 0 0 5px;
+        vertical-align: baseline;
+        border-bottom: 1px solid;
+        font-weight: lighter;
+    }
+</style>
 <div class="row placeholders">
     <% if(data.length){
         for(var i = 0;i<data.length;i++){%>
@@ -9,19 +20,24 @@
                 <h2><%=data[i].titulo%></h2>
             </div>
             <div class="panel-body text-left">
-                <h3><%= data[i].token[0]%></h3>
-                <p><%- data[i].texto1%></p>
-                <h3><%= data[i].token[1]%></h3>
-                <p><%- data[i].texto2%></p>
+                <% data[i].ansToken.map(function(item, index) {%>
+                    <h3><%= item[0]%></h3>
+                    <% if(parseInt(item[1])) {%>
+                    <a href="http://localhost:8080/web-img/<%= item[2]%>">Descargar Archivo</a>
+                    <%} else {%>
+                    <p><%- item[2]%></p>
+                    <%}%>
+                <% }) %>
             </div>
             <div class="panel-footer" style="display: flex;">
                 <img src="<%= data[i].iconouser%>" style="margin: 0;height: 30px" width="30px" class="img-circle img-responsive">
                 <h5 style="margin-left: 10px"><%= data[i].username%></h5>
-                <input type="hidden" name="idpost" value="<%= data[i].idpostinterno%>">
+                <input type="hidden" name="idpost" value="<%= data[i].idavance%>">
                 <button type="submit" value="si" name="resp" class="btn btn-success" style="margin-left:10px"><i class="glyphicon glyphicon-ok"></i></button>
                 <a data-toggle="modal" href="#comm" class="btn btn-danger" style="margin-left:10px"><i class="glyphicon glyphicon-remove"></i></a>
             </div>
         </div>
+        <input type="hidden" name="idproyecto" value="<%= data[i].idproyecto%>">
     </form>
         <div class="modal fade" id="comm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document">
@@ -35,13 +51,14 @@
                         <div class="form-group">
                             <label>Observaciones:</label>
                             <input type="textarea" row="3" class="form-control" style="resize: none" name="comment">
-                            <input type="hidden" name="idpost" value="<%= data[i].idpostinterno%>">
+                            <input type="hidden" name="idpost" value="<%= data[i].idavance%>">
                         </div>
                     </div>
                     <div class="modal-footer">
                         <div class="form-group form-inline">
                             <div class="btn-group">
                                 <a class="btn btn-default" data-dismiss="modal">Cancelar</a>
+                                <input type="hidden" name="idproyecto" value="<%= data[i].idproyecto%>">
                                 <button type="submit" value="no" name="resp" class="btn btn-danger">Rechazar</button>
                             </div>
                         </div>

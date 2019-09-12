@@ -1,0 +1,211 @@
+<%- include ../../layouts/admin_header.ejs %>
+    
+    <h2 style="margin: 0" class="page-header">Editar Evento</h2>
+
+    <form class="form" id="form_edit_event">
+        <div class="row" style="margin-top: 10px">
+            <div class="col-md-5">
+                <h3 style="margin: 0">Nombre Evento</h3>
+                <div class=form-group>
+                    <input type="text" class="form-control" id="event" value="<%=data[0][0].evento%>" required>
+                </div>
+            </div>
+        </div>
+        <h3 style="margin: 0">Editar Etapas</h3>
+        <div id="etapas">
+            <%for(var i=0; i<evento.length; i++){%>
+            <div class="well" id="well<%=evento[i].nro%>">
+                <div class="row">
+                    <div class="form-group col-md-5">
+                        <label>Nombre Etapa <%=evento[i].nro%></label>
+                        <input id="nombre_etapa<%=evento[i].nro%>" type="text" class="form-control" name="nombre_etapa<%=evento[i].nro%>" value="<%=evento[i].nombre%>" required>
+                        <input type="text" class="form-control hidden" id="list_etap<%=evento[i].nro%>" value="<%=evento[i].idetapa%>">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label>N° de Likes por etapa</label>
+                        <input id="likes<%=evento[i].nro%>" type="number" min="0" class="form-control" name="likes<%=evento[i].nro%>" value="<%=evento[i].likes%>" required>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label>N° de Nuevos por etapa</label>
+                        <input id="nuevos<%=evento[i].nro%>" type="number" min="0" class="form-control" name="nuevos<%=evento[i].nro%>" value="<%=evento[i].nuevos%>" required>
+                    </div>
+                    <%if(i == evento.length - 1 && j != 0){%>
+                        <div class="form-group col-md-1 rmv_etapa">
+                            <label>Eliminar</label>
+                            <a class="btn btn-sm btn-danger" data-idetapa="<%=evento[i].nro%>" onclick="remove_etapa(this)"><span class="glyphicon glyphicon-remove"></span></a>
+                        </div>
+                    <%} else {%>
+                        <div class="form-group col-md-1 rmv_etapa hidden">
+                            <label>Eliminar</label>
+                            <a class="btn btn-sm btn-danger" data-idetapa="<%=evento[i].nro%>" onclick="remove_etapa(this)"><span class="glyphicon glyphicon-remove"></span></a>
+                        </div>
+                    <%}%>
+                </div>
+
+                <table class="table table-responsive table-stripped" style="margin: 0">
+                    <tr>
+                        <th>Enunciados</th>
+                        <th>Tipo</th>
+                        <th style="text-align: center;">Agregar/Quitar</th>
+                    </tr>
+                    <tbody id="enunciados_etapa<%=evento[i].nro%>">
+                        <%for(var j=0; j<data[i].length; j++){%>
+                            <tr id="<%=evento[i].nro%>_<%=j+1%>">
+                                <td style="text-align: center;">
+                                    <textarea style="height: 35px; max-width: 650px; margin-right: 0; min-width: 650px" id="enunciado<%=evento[i].nro%>_<%=j+1%>" type="text" class="form-control" name="enunciado<%=evento[i].nro%>_<%=j+1%>" required><%=data[i][j].enunciado%></textarea>
+                                    <input type="text" class="form-control hidden" id="list_enun<%=evento[i].nro%>_<%=j+1%>" value="<%=data[i][j].idenunciado%>">
+                                </td>
+                                <td style="text-align: center;">
+                                    <select class="form-control" id="tipo_respuesta<%=evento[i].nro%>_<%=j+1%>">
+                                        <%if(data[i][j].archivo == 0){%>
+                                            <option selected>Escrito</option>
+                                            <option>Archivo</option>
+                                        <%} else{%>
+                                            <option>Escrito</option>
+                                            <option selected>Archivo</option>
+                                        <%}%>
+                                    </select>
+                                </td>
+                                <td>
+                                    <a class="btn btn-sm btn-success" data-idetapa="<%=evento[i].nro%>" onclick="add_enunciado(this)"><span class="glyphicon glyphicon-plus"></span></a>
+                                    <%if(j == data[i].length - 1 && j != 0){%>
+                                        <a class="btn btn-sm btn-danger rmv_enunciado" id="rmv<%=evento[i].nro%>_<%=j+1%>" data-idetapa="<%=evento[i].nro%>" onclick="remove_enunciado(this)"><span class="glyphicon glyphicon-remove"></span></a>
+                                    <%} else{%>
+                                        <a class="btn btn-sm btn-danger rmv_enunciado hidden" id="rmv<%=evento[i].nro%>_<%=j+1%>" data-idetapa="<%=evento[i].nro%>" onclick="remove_enunciado(this)"><span class="glyphicon glyphicon-remove"></span></a>
+                                    <%}%>
+                                </td>
+                            </tr>
+                        <%}%>
+                    </tbody>
+                </table>
+            </div>
+            <%}%>
+        </div>
+        <button class="btn btn-sm btn-primary pull-right" id="submit" type="">Editar</button>
+    </form>
+    <button style="margin-right: 10px" class="btn btn-sm btn-success pull-right" id="add_etapa" onclick="add_etapa()"><span class="glyphicon glyphicon-plus"></span> Agregar Etapa</button>
+
+<script type="text/javascript">
+    
+    //Cantidad de etapas
+    var count_etapas = parseInt("<%=evento.length%>");
+    // console.log(count_etapas);
+    //Array con la cantidad de enunciados de cada etapa (esta corrido uno atras)
+    var count_enunciados = "<%=enunciados%>".split(" ").map(Number);
+    // console.log(count_enunciados);
+
+    var init_list_enunciados = [];
+    var init_list_etapas = [];
+    for(var i=0; i<count_etapas; i++){
+        init_list_etapas.push(parseInt($("#list_etap"+ (i+1)).val()));
+        for(var j=0; j < count_enunciados[i]; j++){
+            if(init_list_enunciados[i] == null){
+                init_list_enunciados[i] = [parseInt($("#list_enun"+ (i+1) + "_" + (j+1)).val())];
+            } else{
+                init_list_enunciados[i].push(parseInt($("#list_enun"+ (i+1) + "_" + (j+1)).val()));
+            }
+        }
+    }
+
+    function add_etapa(){
+        count_enunciados[count_etapas] = 1;
+        count_etapas += 1;
+        $(".rmv_etapa").addClass("hidden");
+        var html_etapa = '<div class="well" id="well' + count_etapas + '"><div class="row"><div class="form-group col-md-5">'
+                    +'<label>Nombre Etapa ' + count_etapas + '</label><input id="nombre_etapa' + count_etapas + '" type="text" class="form-control" name="nombre_etapa' + count_etapas + '" placeholder="Nombre" required>'
+                    + '<input type="text" class="form-control hidden" id="list_etap' + count_etapas + '" value="0"></div>'
+                    +'<div class="form-group col-md-3"><label>N° de Likes por etapa</label><input id="likes' + count_etapas + '" type="number" min="1" class="form-control" name="likes' + count_etapas + '" required></div>'
+                    +'<div class="form-group col-md-3"><label>N° de Nuevos por etapa</label><input id="nuevos' + count_etapas + '" type="number" min="1" class="form-control" name="nuevos' + count_etapas + '" required></div>'
+                    +'<div class="form-group col-md-1 rmv_etapa"><label>Eliminar</label><a class="btn btn-sm btn-danger" data-idetapa="' + count_etapas + '" onclick="remove_etapa(this)"><span class="glyphicon glyphicon-remove"></span></a></div></div>'
+                    +'<table class="table table-responsive table-stripped" style="margin: 0"><tr><th>Enunciados</th><th>Tipo</th><th style="text-align: center;">Agregar/Quitar</th></tr>'
+                    +'<tbody id="enunciados_etapa' + count_etapas + '"><tr id="' + count_etapas + '_1"><td style="text-align: center;"><textarea style="height: 35px; max-width: 650px; margin-right: 0; min-width: 650px" id="enunciado' + count_etapas + '_1" type="text" class="form-control" name="enunciado' + count_etapas + '_1" required></textarea><input type="text" class="form-control hidden" id="list_enun' + count_etapas + '_1" value="0"></td>'
+                    +'<td style="text-align: center;"><select class="form-control" id="tipo_respuesta' + count_etapas + '_1"><option selected>Escrito</option><option>Archivo</option></select></td>'
+                    +'<td><a class="btn btn-sm btn-success" data-idetapa="' + count_etapas + '" onclick="add_enunciado(this)"><span class="glyphicon glyphicon-plus"></span></a>'
+                    +'<a class="btn btn-sm btn-danger rmv_enunciado hidden" id="rmv' + count_etapas + '_1" data-idetapa="' + count_etapas + '" onclick="remove_enunciado(this)"><span class="glyphicon glyphicon-remove"></span></a></td></tr></tbody></table></div>';
+        $("#etapas").append(html_etapa);
+        console.log(count_enunciados);
+    }
+
+    function remove_etapa(yo){
+        count_etapas -= 1;
+        count_enunciados[count_etapas] = 0;
+        $("#well" + $(yo).data("idetapa")).remove();
+        $(".rmv_etapa").addClass("hidden");
+        //Muestro el btn eliminar etapa anterior
+        if(count_etapas > 1){
+            $(".rmv_etapa").last().removeClass("hidden");
+        }
+        console.log(count_enunciados);
+    }
+
+    function add_enunciado(yo){
+        var idetapa = $(yo).data("idetapa") - 1;
+        count_enunciados[idetapa] += 1;
+        $("well" + (idetapa + 1) + " > .rmv_enunciado").addClass("hidden");
+        new_idenunciado = idetapa + 1 + '_' + count_enunciados[idetapa];
+        var html_enunciado = '<tr id="' + new_idenunciado + '">'
+            +'<td style="text-align: center;"><textarea style="height: 35px; max-width: 650px; margin-right: 0; min-width: 650px" id="enunciado' + new_idenunciado + '" type="text" class="form-control" name="enunciado' + new_idenunciado + '" required></textarea><input type="text" class="form-control hidden" id="list_enun' + new_idenunciado + '" value="0"></td>\n'
+            + '<td style="text-align: center;"><select class="form-control" id="tipo_respuesta' + new_idenunciado + '"><option selected>Escrito</option><option>Archivo</option></select></td>\n'
+            + '<td>\n'
+                +'<a class="btn btn-sm btn-success" data-idetapa="' + (idetapa+1) + '" onclick="add_enunciado(this)"><span class="glyphicon glyphicon-plus"></span></a>\n'
+                +'<a class="btn btn-sm btn-danger rmv_enunciado" id="rmv' + new_idenunciado + '" data-idetapa="' + (idetapa+1) + '" onclick="remove_enunciado(this)"><span class="glyphicon glyphicon-remove"></span></a>\n</td></tr>'
+        $("#enunciados_etapa" + (idetapa+1)).append(html_enunciado);
+    }
+
+    function remove_enunciado(yo){
+        var idetapa = $(yo).data("idetapa") - 1;
+        var idenunciado = "#" + (idetapa+1) + "_" + count_enunciados[idetapa];
+        $(idenunciado).remove();
+        count_enunciados[idetapa] -= 1;
+        //Muestro el btn eliminar, excepto el primero
+        if(count_enunciados[idetapa] > 1){
+            $("#rmv" + (idetapa + 1) + '_' + count_enunciados[idetapa]).removeClass("hidden");
+        }
+        console.log(count_enunciados);
+    }
+
+    $("form#form_edit_event").on('submit', function(e){
+        e.preventDefault();
+        var event = $("#event").val();
+        var idevento = parseInt("<%=data[0][0].idevento%>");
+        var data = [];
+        for(var i=0; i<count_etapas; i++){
+            data.push([$("#nombre_etapa"+ (i+1)).val(), 
+                $("#likes"+ (i+1)).val(), 
+                $("#nuevos"+ (i+1)).val()]);
+        }
+        var end_list_enunciados = [];
+        var end_list_etapas = [];
+        for(var i=0; i<count_etapas; i++){
+            //console.log("etapa " + (i + 1));
+            end_list_etapas.push(parseInt($("#list_etap"+ (i+1)).val()));
+            for(var j=0; j < count_enunciados[i]; j++){
+                data[i].push([$("#enunciado"+ (i+1) + "_" + (j+1)).val(),
+                    $("#tipo_respuesta"+ (i+1) + "_" + (j+1)).val(),
+                    parseInt($("#list_enun"+ (i+1) + "_" + (j+1)).val())]);
+                if(end_list_enunciados[i] == null){
+                    end_list_enunciados[i] = [parseInt($("#list_enun"+ (i+1) + "_" + (j+1)).val())];
+                } else{
+                    end_list_enunciados[i].push(parseInt($("#list_enun"+ (i+1) + "_" + (j+1)).val()));
+                }
+            }
+        }
+        $.ajax({
+            type: 'POST',
+            data: JSON.stringify({data: data, event: event, idevento: idevento, ilist_enun: init_list_enunciados, elist_enun: end_list_enunciados, ilist_etap: init_list_etapas, elist_etap: end_list_etapas}),
+            contentType: 'application/json',
+            url: '/evnt/edit',
+            success: function(data) {
+                if(data == "ok"){
+                    alert("Evento actualizado correctamente.");
+                } else{
+                    alert(data);
+                }
+                window.location.href="/edit_event/" + idevento;
+            }
+        });
+    });
+
+</script>
+
+<%- include ../../layouts/footer.ejs %>

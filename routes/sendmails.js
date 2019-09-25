@@ -9,7 +9,7 @@ var transporter = nodemailer.createTransport({
     secure: true,
     auth: {
         user: 'observaciudadania17@gmail.com',
-        pass: 'proyectaobserva'
+        pass: 'observa2020'
     }
 });
 

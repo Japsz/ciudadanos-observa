@@ -64,7 +64,12 @@ exports.user_login_handler = function(req, res){
                                       req.session.idobs = rows;
                                       req.session.isUserLogged = true;
                                       if(nom == null){
-                                          res.render("/f_login",{data: users[0], obs: rows[0]});
+                                          res.render("f_login",{data: users[0], obs: rows[0]}, function(err, html){
+                                              if(err){
+                                                  console.log(err)
+                                              }
+                                              res.send(html)
+                                          });
                                       } else res.redirect('/indx');
                                   });
                                   break;

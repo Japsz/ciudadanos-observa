@@ -94,7 +94,6 @@ exports.user_login_handler = function(req, res){
                       }
                   })
               } else {
-          	      console.log(users)
                   res.redirect('/bad_login');
               }
           });

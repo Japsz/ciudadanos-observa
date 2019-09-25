@@ -57,7 +57,7 @@ exports.edit_event = function(req, res){
                             new_data[data[i].nro - 1].push(data[i]);
                         }
                     }
-                    console.log(new_data);
+                    //console.log(new_data);
                     if(data.length){
                             res.render('admin/event/edit_event',{page_title:"Editar evento", data: new_data, evento:evento, usr:req.session.user, enunciados: enunciados});
                         } else res.redirect("/bad_login");
@@ -95,14 +95,14 @@ exports.save_edit_event = function(req,res){
             }
             delete_etapa_sql += ")";
             delete_etapa_sql2 += ")";
-            console.log(delete_etapa_sql);
+            //console.log(delete_etapa_sql);
             req.getConnection(function (err, connection) {
                 connection.query(delete_etapa_sql, function(err, enunciados){
                     if(err){
                         console.log("Error deleting enunciado : %s ",err );
                         msj_res += "No se pueden eliminar enunciados que tienen respuestas.";
                     }
-                    console.log(delete_etapa_sql2);
+                    //console.log(delete_etapa_sql2);
                     connection.query(delete_etapa_sql2, function(err, etapas){
                         if(err){
                             console.log("Error deleting etapa : %s ",err );
@@ -155,7 +155,7 @@ exports.save_edit_event = function(req,res){
                             }
                         }
                     }
-                    console.log(insert_enunciado_sql);
+                    //console.log(insert_enunciado_sql);
                     connection.query(insert_enunciado_sql, function(err, etapas){
                         if(err) console.log("Error inserting enunciados: %s ",err );
                     });
@@ -178,7 +178,7 @@ exports.save_edit_event = function(req,res){
             }
         }
         if(delete_enunciado.length > 0){
-            console.log(delete_enunciado);
+            //console.log(delete_enunciado);
             var update_delete_sql = "DELETE FROM enunciado WHERE idenunciado IN (";
             for(var e=0; e<delete_enunciado.length; e++){
                 update_delete_sql += delete_enunciado[e];
@@ -187,7 +187,7 @@ exports.save_edit_event = function(req,res){
                 }
             }
             update_delete_sql += ")";
-            console.log(update_delete_sql);
+            //console.log(update_delete_sql);
             req.getConnection(function (err, connection) {
                 connection.query(update_delete_sql, function(err, enunciados){
                     if(err){
@@ -222,7 +222,7 @@ exports.save_edit_event = function(req,res){
             }
         }
         if(new_enun.length > 0){
-            console.log(update_insert_sql);
+            //console.log(update_insert_sql);
             req.getConnection(function (err, connection) {
                 connection.query(update_insert_sql, function(err, etapas){
                     if(err) console.log("Error inserting enunciados: %s ",err );
@@ -247,7 +247,7 @@ exports.save_edit_event = function(req,res){
                     }
                 }
                 update_etapas_sql += " ON DUPLICATE KEY UPDATE idetapa=VALUES(idetapa), idevento=VALUES(idevento), nro=VALUES(nro), nombre=VALUES(nombre), likes=VALUES(likes), nuevos=VALUES(nuevos)";
-                console.log(update_etapas_sql);
+                //console.log(update_etapas_sql);
                 connection.query(update_etapas_sql, function(err, rows){
                     if (err) console.log("Error updating etapas: %s ",err );
                     var update_enunciados_sql = "INSERT INTO enunciado (idenunciado, idetapa, enunciado, archivo) VALUES ";
@@ -270,7 +270,7 @@ exports.save_edit_event = function(req,res){
                         }
                     }
                     update_enunciados_sql += " ON DUPLICATE KEY UPDATE idenunciado=VALUES(idenunciado), idetapa=VALUES(idetapa), enunciado=VALUES(enunciado), archivo=VALUES(archivo)";
-                    console.log(update_enunciados_sql);
+                    //console.log(update_enunciados_sql);
                     connection.query(update_enunciados_sql, function(err, rows){
                         if (err) console.log("Error updating enunciados: %s ",err );
                         if(msj_res == ""){
@@ -300,7 +300,7 @@ exports.obs_list = function(req, res){
                     + ' LEFT JOIN event ON event.idevento = etapas.idevento'
                     + ' WHERE etapas.idevento = ? ORDER BY nro ASC',req.params.id,function(err,etapas) {
                     if(err) console.log("Error Selecting : %s ",err );
-                    console.log(etapas);
+                    //console.log(etapas);
                     if(etapas.length){
                         res.render('admin/event/event_obs',{page_title:"Observatorios",data:rows, etapa:etapas, usr:req.session.user});
                     } else res.redirect("/bad_login");
@@ -388,7 +388,6 @@ exports.inst_edit = function(req,res){
                 direccion : input.direccion,
                 avatar_pat : "/assets/img/placeholder.png"
             };
-            console.log(input);
             connection.query("UPDATE institucion SET ? WHERE idinstitucion = ?",[inst_data,input.id], function(err, rows)
             {
 

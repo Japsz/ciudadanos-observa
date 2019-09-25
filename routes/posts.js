@@ -12,11 +12,10 @@ exports.indx = function(req, res){
                 + ' GROUP_CONCAT(DISTINCT tags.tag,"@", tags.idtag ORDER BY tags.tag) AS tagz,'
                 + ' COUNT(DISTINCT megusta.iduser) as likes, GROUP_CONCAT(DISTINCT megusta.iduser) as laiktoken, observatorio.nom FROM post'
                 + ' LEFT JOIN observatorio ON post.idobs=observatorio.idobservatorio'
-                + ' LEFT JOIN tagpost ON post.idpost = tagpost.idpost LEFT JOIN tags ON tagpost.idtag = tags.idtag INNER JOIN user ON user.iduser = post.iduser'
+                + ' LEFT JOIN tagpost ON post.idpost = tagpost.idpost LEFT JOIN tags ON tagpost.idtag = tags.idtag LEFT JOIN user ON user.iduser = post.iduser'
                 + ' LEFT JOIN megusta ON megusta.idpost = post.idpost LEFT JOIN comentario ON comentario.idpost = post.idpost WHERE post.estado = 2 GROUP BY post.idpost ORDER BY post.fecha DESC LIMIT 6',function(err,rows){
                 if(err)
                     console.log("Error Selecting : %s ",err );
-                console.log(rows);
                 res.render('posts/cdd_index',{data :rows, usr:req.session.user, obs: req.session.idobs,stream: "indx",helper: ""});
 
                 //console.log(query.sql);
@@ -32,7 +31,7 @@ exports.indx_stream = function(req, res){
         var render = "posts/";
         var query = 'SELECT post.*, GROUP_CONCAT(DISTINCT megusta.iduser) as laiktoken,COALESCE(user.avatar_pat,"/assets/img/placeholder.png") AS iconouser,user.username,' +
             'GROUP_CONCAT(DISTINCT tags.tag,"@", tags.idtag ORDER BY tags.tag) AS tagz, COUNT(DISTINCT megusta.iduser) as likes,  COUNT(DISTINCT comentario.idcomentario) as c_count, observatorio.nom FROM' +
-            ' post LEFT JOIN observatorio ON post.idobs=observatorio.idobservatorio LEFT JOIN tagpost ON post.idpost = tagpost.idpost LEFT JOIN comentario ON comentario.idpost = post.idpost LEFT JOIN tags ON tagpost.idtag = tags.idtag INNER JOIN user ON user.iduser = post.iduser' +
+            ' post LEFT JOIN observatorio ON post.idobs=observatorio.idobservatorio LEFT JOIN tagpost ON post.idpost = tagpost.idpost LEFT JOIN comentario ON comentario.idpost = post.idpost LEFT JOIN tags ON tagpost.idtag = tags.idtag LEFT JOIN user ON user.iduser = post.iduser' +
             ' LEFT JOIN megusta ON megusta.idpost = post.idpost WHERE post.fecha < ? ';
         switch(input.strim){
             case "indx":
@@ -157,7 +156,6 @@ exports.save = function(req,res){
             }
             if(input.idobserva != 'no'){
                 data.idobs = input.idobserva;
-                console.log(input.idobserva);
             }
             connection.query("INSERT INTO post SET ? ",data, function(err, rows) {
                 if(err) console.log("Error inserting : %s ",err );
@@ -170,7 +168,6 @@ exports.save = function(req,res){
                         if(err) {
                             console.log("Error Selecting : %s ",err );
                         } else if(obs.length > 0) {
-                            console.log(obs);
                             //Variables para envio de correo, data_mail debe tener las mismas variables
                             var correos = [];
                             for(var i=0; i<obs.length; i++){
@@ -208,14 +205,13 @@ exports.save = function(req,res){
                         if (err) console.log("Error INSERTINg : %s ",err );
                         connection.query(query2,tags, function(err, tags) {
                             if (err) console.log("Error selecting : %s ",err );
-                            console.log(tags);
+                            //console.log(tags);
                             var query ="INSERT INTO tagpost (`idtag`, `idpost`) VALUES ?";
                             var list = [];
                             for(var i = 0; i < tags.length;i++){
                                 aux =[tags[i].idtag,postid];
                                 list.push(aux);
                             }
-                            console.log(input.cat);
                             if(input.cat != ""){
                                 list.push([input.cat,postid]);
                             }

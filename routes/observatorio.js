@@ -19,7 +19,7 @@ exports.list = function(req, res){
 
                 if(err)
                     console.log("Error Selecting : %s ",err );
-                console.log(rows);
+                //console.log(rows);
                 res.render('admin/obs/instit_list',{page_title:"Instituciones",data:rows, usr:req.session.user});
 
             });

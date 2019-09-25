@@ -123,7 +123,6 @@
                     +'<td><a class="btn btn-sm btn-success" data-idetapa="' + count_etapas + '" onclick="add_enunciado(this)"><span class="glyphicon glyphicon-plus"></span></a>'
                     +'<a class="btn btn-sm btn-danger rmv_enunciado hidden" id="rmv' + count_etapas + '_1" data-idetapa="' + count_etapas + '" onclick="remove_enunciado(this)"><span class="glyphicon glyphicon-remove"></span></a></td></tr></tbody></table></div>';
         $("#etapas").append(html_etapa);
-        console.log(count_enunciados);
     }
 
     function remove_etapa(yo){
@@ -135,7 +134,7 @@
         if(count_etapas > 1){
             $(".rmv_etapa").last().removeClass("hidden");
         }
-        console.log(count_enunciados);
+        //console.log(count_enunciados);
     }
 
     function add_enunciado(yo){
@@ -161,7 +160,6 @@
         if(count_enunciados[idetapa] > 1){
             $("#rmv" + (idetapa + 1) + '_' + count_enunciados[idetapa]).removeClass("hidden");
         }
-        console.log(count_enunciados);
     }
 
     $("form#form_edit_event").on('submit', function(e){

@@ -243,7 +243,7 @@ exports.get_modpost = function(req, res){
             {
                 if(err)
                     console.log("Error Selecting : %s ",err );
-                console.log(rows);
+                //console.log(rows);
 
                 var posts = rows;
                 connection.query('SELECT comentario.*,user.username,user.iduser FROM' +

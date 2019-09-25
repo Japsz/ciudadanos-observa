@@ -17,7 +17,6 @@ exports.list = function(req, res){
 								var aux= [];
 								var aux2;
 								for(var i=0;i<monits.length;i++){
-									console.log(monits[i].obsinfo);
 									if(monits[i].tipo == 1 && typeof monits[i].obsinfo != "object"){
 										aux2 = monits[i].obsinfo.split(",");
 										for(var j = 0;j<aux2.length;j++){
@@ -286,7 +285,6 @@ exports.modproy = function(req,res){
 exports.moderate_p = function(req,res){
     if(req.session.isAdminLogged){
         var input = JSON.parse(JSON.stringify(req.body));
-        console.log(input)
         req.getConnection(function(err,connection){
         	if(input.resp === "si"){
         		connection.query("UPDATE avance SET estado = 'aprobado' WHERE idavance = ?",input.idpost,function(err,rows){
@@ -518,7 +516,7 @@ exports.g_csv_proy = function(req,res){
                 f_gen = f_gen.replace(/\:/g,'');
                 f_gen = f_gen.replace(/\//g,'');
                 f_gen = f_gen.replace(/\,/g,'');
-                console.log(req.path);
+                //console.log(req.path);
                 var pat = 'public/csvs/obspry_' + input.idobs +'_hasta_~_' + f_gen + '.csv';
                 if(rows.length){
                     // 'C:/Users/Go Jump/Desktop/'

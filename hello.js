@@ -182,7 +182,7 @@ app.get('/get_stats', function(req,res){
                                 comentarios_count[0]["comentarios_count"],
                                 post_count[0]["post_count"]
                                 ]
-                            console.log(user_count);
+                            //console.log(user_count);
                             res.send(datas);
                         });
                     });
@@ -195,7 +195,7 @@ app.get('/get_stats', function(req,res){
 app.post('/subir_pic', function (req,res) {
     var f_gen = new Date();
     var newname = "user" + req.session.user.iduser.toString() + "-" + f_gen.getTime() + ".jpg";
-    console.log(req.files);
+    //console.log(req.files);
     var newpath = './public/web-img/' + newname;
     req.files.filetoupload.mv(newpath);
     res.send("/web-img/" + newname);

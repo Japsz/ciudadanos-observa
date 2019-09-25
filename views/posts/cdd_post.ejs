@@ -81,7 +81,7 @@
                         var loading = false;
                         var fin = <% if(data.length < 6){%>true<%} else {%>false<%}%>;
                         $(window).scroll(function() {
-                            console.log(loading);
+                            //console.log(loading);
                             if($(window).scrollTop() + $(window).height() > $(document).height() - 100 && !loading && !fin)  {
                                 loading = true;
                                 $("#loader").removeClass("hidden");

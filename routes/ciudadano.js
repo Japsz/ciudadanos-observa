@@ -352,7 +352,10 @@ exports.save_edit_f = function(req, res){
     if(req.session.isUserLogged){
         var input = JSON.parse(JSON.stringify(req.body));
         var bcrypt = require('bcryptjs')
-        bcrypt.hash(input.password, 10, function(err, hash) {
+        bcrypt.hash(input.pass, 10, function(err, hash) {
+            if(err){
+                console.log(err)
+            }
             var data = {
                 avatar_pat: input.avatr,
                 username : input.username,

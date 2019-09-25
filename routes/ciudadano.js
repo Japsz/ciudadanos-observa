@@ -351,42 +351,45 @@ exports.save_edit_f = function(req, res){
 
     if(req.session.isUserLogged){
         var input = JSON.parse(JSON.stringify(req.body));
-        var data = {
-            avatar_pat: input.avatr,
-            username : input.username,
-            password : input.pass,
-            tipo : req.session.user.tipo,
-            nombre : input.name,
-            apellido : input.ape,
-            rut : input.rut,
-            fnac : input.fnac,
-            gender : input.gend,
-            correo : input.correo,
-            comuna : input.comuna
-        };
-        req.getConnection(function(err,connection){
+        var bcrypt = require('bcryptjs')
+        bcrypt.hash(input.password, 10, function(err, hash) {
+            var data = {
+                avatar_pat: input.avatr,
+                username : input.username,
+                password : hash,
+                tipo : req.session.user.tipo,
+                nombre : input.name,
+                apellido : input.ape,
+                rut : input.rut,
+                fnac : input.fnac,
+                gender : input.gend,
+                correo : input.correo,
+                comuna : input.comuna
+            };
+            req.getConnection(function(err,connection){
 
-            connection.query("UPDATE user set ? WHERE iduser = ? ",[data,req.session.user.iduser],function(err,rows)
-            {
-                if(err)
-                    console.log("Error Selecting : %s ",err );
-
-                connection.query("SELECT * FROM user WHERE iduser = ? ",[req.session.user.iduser],function(err,rows)
+                connection.query("UPDATE user set ? WHERE iduser = ? ",[data,req.session.user.iduser],function(err,rows)
                 {
                     if(err)
                         console.log("Error Selecting : %s ",err );
-                    if(rows.length == 1){
-                        req.session.user = rows[0];
-                        res.redirect('/indx');
-                    }
+
+                    connection.query("SELECT * FROM user WHERE iduser = ? ",[req.session.user.iduser],function(err,rows)
+                    {
+                        if(err)
+                            console.log("Error Selecting : %s ",err );
+                        if(rows.length == 1){
+                            req.session.user = rows[0];
+                            res.redirect('/indx');
+                        }
+
+                        //console.log(query.sql);
+                    });
 
                     //console.log(query.sql);
                 });
-
-                //console.log(query.sql);
             });
         });
-    }
+    } else res.redirect('/bad_login')
 };
 
 exports.m_post = function(req,res){

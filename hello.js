@@ -1,7 +1,6 @@
 var express = require('express');
 var routes = require('./routes/index');
 var http = require('http');
-var proxy = require('http-proxy').createProxyServer({});
 var path = require('path');
 
 var app = express(), mailer = require("express-mailer");
@@ -56,15 +55,10 @@ app.use(expressFU({
     preserveExtension: true,
     safeFileNames: true
 }));
+var credentials = require('./dbCredentials')
 
 app.use(
-    connection(mysql,{
-        host: '127.0.0.1',
-        user: 'root',
-        password : 'observaproyecta',
-        port : 3306,
-        database:'Observapp'
-    },'pool')
+    connection(mysql,credentials,'pool')
 );
 
 app.get('/', routes.index);
@@ -171,11 +165,6 @@ app.get('/bad_login', users.bad_login);
 app.post('/admin_login_handler', users.admin_login_handler);
 app.post('/user_login_handler', users.user_login_handler);
 
-app.use('/lab',function(req,res){
-    proxy.web(req, res, {
-        target: 'http://localhost:8081'
-    });
-});
 // stats ajax
 app.get('/get_stats', function(req,res){
     req.getConnection(function(err,connection){

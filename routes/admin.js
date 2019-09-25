@@ -187,40 +187,58 @@ exports.save_cdd = function(req,res){
                         });
                     });
                 } else {
-                    // Si no está registrado el correo, crear usuario
-                    connection.query("INSERT INTO user SET ? ",data, function(err, rows) {
+                    var bcrypt = require('bcryptjs')
+                    bcrypt.hash(data.password, 10, function(err, hash) {
+                      data.password = hash
+                      // Si no está registrado el correo, crear usuario
+                      connection.query("INSERT INTO user SET ? ",data, function(err, rows) {
                         if (err){
-                            console.log("Error inserting : %s ",err );
+                          console.log("Error inserting : %s ",err );
                         } else {
-                            // Vincular usuario creado al observatorio
-                            connection.query("INSERT INTO ciudadano SET ?",{idobs : input.idobs, iduser : rows.insertId}, function(err, rowss) {
-                                if (err) console.log("Error Inserting cdd : %s ", err);
-                                // Reactivacion de usuario y Envio de mail
-                                connection.query("SELECT nom FROM observatorio WHERE idobservatorio=?", input.idobs,function(err, obs) {
-                                    if(err) {
-                                        console.log("Error Selecting observatorio: %s",err);
-                                    } else {
-                                        //Variables para envio de correo, data_mail debe tener las mismas variables
-                                        var info = new Array(obs[0].nom, input.idobs, rows.insertId, false); //Envia el nombre del obs, idobs, iduser, usuario existe
-                                        var mails = new Array(input.correo); //Debe ser array!
-                                        var subj = "Bienvenido a observatorio de Observa Ciudadanía";
-                                        var data_mail = {
-                                            view: "views\\admin\\obs\\save_cdd.ejs", //Path
-                                            subject: subj, //Asunto del mensaje
-                                            inf: info, //Array con informacion necesaria
-                                            mails: mails}; //Array de los correos
-                                        send.send_mail(data_mail,function(err) {
-                                            if(err){
-                                                console.log(err.message);
-                                            }
-                                        });
-                                        console.log("Se vinculo a " + input.correo + " a observatorio " + input.idobs + ", mail enviado correctamente.");
-                                        res.redirect('/show_obs/' + input.idobs);
-                                    }
+                          // Vincular usuario creado al observatorio
+                          connection.query("INSERT INTO ciudadano SET ?",{idobs : input.idobs, iduser : rows.insertId}, function(err, rowss) {
+                            if (err) console.log("Error Inserting cdd : %s ", err);
+
+                            // Reactivacion de usuario y Envio de mail
+                            connection.query("SELECT nom FROM observatorio WHERE idobservatorio=?", input.idobs,function(err, obs) {
+                              if(err) {
+                                console.log("Error Selecting observatorio: %s",err);
+                              } else {
+                                //Variables para envio de correo, data_mail debe tener las mismas variables
+                                var info = new Array(obs[0].nom, input.idobs, rows.insertId, false); //Envia el nombre del obs, idobs, iduser, usuario existe
+                                var mails = new Array(input.correo); //Debe ser array!
+                                var subj = "Bienvenido a observatorio de Observa Ciudadanía";
+                                var data_mail = {
+                                  view: "views\\admin\\obs\\save_cdd.ejs", //Path
+                                  subject: subj, //Asunto del mensaje
+                                  inf: info, //Array con informacion necesaria
+                                  mails: mails}; //Array de los correos
+                                send.send_mail(data_mail,function(err) {
+                                  if(err){
+                                    console.log(err.message);
+                                  }
                                 });
+                                console.log("Se vinculo a " + input.correo + " a observatorio " + input.idobs + ", mail enviado correctamente.");
+                              }
                             });
+                            // Enviar correo de Usuario nuevo.
+                            res.mailer.send('mail', {
+                              to: input.correo, // REQUIRED. This can be a comma delimited string just like a normal email to field.
+                              subject: 'Estás Inscrito en ObservaCiudadanía!', // REQUIRED.
+                              password: pass,
+                              usrname: input.correo.split("@")[0]// All additional properties are also passed to the template as local variables.
+                            }, function (err) {
+                              if (err) {
+                                // handle error
+                                console.log(err);
+                                res.sendStatus(500)
+                              } else
+                                res.redirect('/show_obs/' + input.idobs);
+                            });
+                          });
                         }
-                    });
+                      });
+                    })
                 }
             });
         });
@@ -324,32 +342,30 @@ exports.add = function(req, res){
 // Logica agregar user.
 exports.save = function(req,res){
 	if(req.session.isAdminLogged){
-		var input = JSON.parse(JSON.stringify(req.body));
-		req.getConnection(function (err, connection) {
+    var input = JSON.parse(JSON.stringify(req.body));
+    req.getConnection(function (err, connection) {
+      var bcrypt = require('bcryptjs')
+      bcrypt.hash(input.password,10, function(err, hash){
+        var data = {
 
-				var data = {
+          username   : input.username,
+          password   : hash,
+          tipo	   : input.tipo,
+          correo	   : input.correo,
+          avatar_pat : "/assets/img/placeholder.png"
 
-						username   : input.username,
-						password   : input.password,
-						tipo	   : input.tipo,
-						correo	   : input.correo,
-	                    avatar_pat : "/assets/img/placeholder.png"
+        };
+        connection.query("INSERT INTO user SET ? ",data, function(err, rows)
+        {
 
-				};
-				var query = connection.query("INSERT INTO user SET ? ",data, function(err, rows)
-				{
+          if (err)
+            console.log("Error inserting : %s ",err );
 
-					if (err)
-							console.log("Error inserting : %s ",err );
-
-                    res.redirect('/user');
-				});
-
-			 // console.log(query.sql); get raw query
-
-		});
-		}
-		else res.redirect('/bad_login');
+          res.redirect('/user');
+        });
+      })
+    });
+  }	else res.redirect('/bad_login');
 };
 //Vista editar usuario.
 exports.edit = function(req, res){
@@ -383,22 +399,24 @@ exports.save_edit = function(req,res){
 		
 		req.getConnection(function (err, connection) {
 				
-				var data = {
+      var bcrypt = require('bcryptjs')
+      bcrypt.hash(input.password, 10, function(err, hash) {
+        var data = {
 
-						username   : input.username,
-						password   : input.password 
-				
-				};
-				
-				connection.query("UPDATE user set ? WHERE username = ? ",[data,username], function(err, rows)
-				{
-	
-					if (err)
-							console.log("Error Updating : %s ",err );
-				 
-					res.redirect('/user');
-					
-				});
+          username   : input.username,
+          password   : hash
+
+        };
+        connection.query("UPDATE user set ? WHERE username = ? ",[data,username], function(err, rows)
+        {
+
+          if (err)
+            console.log("Error Updating : %s ",err );
+
+          res.redirect('/user');
+
+        });
+      })
 		});
 		}
 		else res.redirect('/bad_login');

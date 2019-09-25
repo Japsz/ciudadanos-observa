@@ -30,9 +30,9 @@ exports.user_login_handler = function(req, res){
 
 	var input = JSON.parse(JSON.stringify(req.body));
     if(input.username.split("@").length > 1){
-        var query = "SELECT * FROM user WHERE correo = ? AND password = ?";
+        var query = "SELECT * FROM user WHERE correo = ? LIMIT 1";
     } else {
-        var query = 'SELECT * FROM user WHERE username = ? AND password = ?'
+        var query = 'SELECT * FROM user WHERE username = ? LIMIT 1'
     }
 	var username = input.username;
 
@@ -41,7 +41,7 @@ exports.user_login_handler = function(req, res){
     req.getConnection(function(err,connection){
         if(err)
             console.log("Error Selecting : %s ",err );
-          connection.query(query,[username,password],function(err,users)
+          connection.query(query,[username],function(err,users)
           {
               if(err)
                   console.log("Error Selecting : %s ",err );
@@ -49,38 +49,42 @@ exports.user_login_handler = function(req, res){
           	  	console.log('Invalid Username or Password.');
           	  	res.redirect('/bad_login');
           	  } else if(users.length == 1){
-                  req.session.user = users[0];
-                  var nom = users[0].nombre;
-                  switch(users[0].tipo){
-                      case 3:
-                          connection.query('SELECT observatorio.* FROM observatorio LEFT JOIN ciudadano ON ciudadano.idobs = observatorio.idobservatorio WHERE ciudadano.iduser = ?',users[0].iduser,function (err, rows){
-                              if(err) console.log("Error selecting cdd: %s",err);
-                              req.session.idobs = rows;
-                              req.session.isUserLogged = true;
-                              console.log(rows);
-                              if(nom == null){
-                                  res.render("/f_login",{data: users[0], obs: rows[0]});
-                              } else res.redirect('/indx');
-                          });
-                          break;
-                      case 2:
-                          req.session.isUserLogged = true;
-                          res.redirect("/mod_indx");
-                          break;
-                      case 1:
-                          connection.query('SELECT observatorio.* FROM observatorio LEFT JOIN monitor ON monitor.idobservatorio = observatorio.idobservatorio WHERE monitor.idmonitor = ? GROUP BY observatorio.idobservatorio',users[0].iduser,function (err, rows){
-                              if(err) console.log("Error selecting obs: %s",err);
-                              console.log(typeof rows);
-                              console.log(rows);
-                              req.session.idobs = rows;
-                              req.session.isUserLogged = true;
-                              req.session.isMonitLogged = true;
-                              res.redirect('/indx');
-                          });
-                          break;
-                      default:
+                  var bcryptjs = require('bcryptjs')
+                  bcryptjs.compare(password, users[0].password, function(err, result){
+                      if(result) {
+                          req.session.user = users[0];
+                          var nom = users[0].nombre;
+                          switch(users[0].tipo){
+                              case 3:
+                                  connection.query('SELECT observatorio.* FROM observatorio LEFT JOIN ciudadano ON ciudadano.idobs = observatorio.idobservatorio WHERE ciudadano.iduser = ?',users[0].iduser,function (err, rows){
+                                      if(err) console.log("Error selecting cdd: %s",err);
+                                      req.session.idobs = rows;
+                                      req.session.isUserLogged = true;
+                                      if(nom == null){
+                                          res.render("/f_login",{data: users[0], obs: rows[0]});
+                                      } else res.redirect('/indx');
+                                  });
+                                  break;
+                              case 2:
+                                  req.session.isUserLogged = true;
+                                  res.redirect("/mod_indx");
+                                  break;
+                              case 1:
+                                  connection.query('SELECT observatorio.* FROM observatorio LEFT JOIN monitor ON monitor.idobservatorio = observatorio.idobservatorio WHERE monitor.idmonitor = ? GROUP BY observatorio.idobservatorio',users[0].iduser,function (err, rows){
+                                      if(err) console.log("Error selecting obs: %s",err);
+                                      req.session.idobs = rows;
+                                      req.session.isUserLogged = true;
+                                      req.session.isMonitLogged = true;
+                                      res.redirect('/indx');
+                                  });
+                                  break;
+                              default:
+                                  res.redirect('/bad_login');
+                          }
+                      } else {
                           res.redirect('/bad_login');
-                  }
+                      }
+                  })
               }
           });
            
@@ -206,15 +210,18 @@ exports.validate_recovery = function (req, res) {
     req.getConnection(function(err,connection){
         if(err) console.log("Error en la conexión %s",err);
         // Se setea el flag para recuperar la contraseña
-        connection.query("UPDATE user SET recovery = 0, password = ? WHERE recovery = ?",[req.body.pass,req.body.recovery],function(err,cdd)
-        {
-            if(err){
-                console.log("Error Selecting : %s ",err );
-                res.send({error: true, str: "Hubo un error al hacer la búsqueda"});
-                return;
-            }
-            res.send({error: false})
-        });
+        var bcrypt = require('bcryptjs')
+        bcrypt.hash(req.body.pass, 10, function(err, hash){
+            connection.query("UPDATE user SET recovery = 0, password = ? WHERE recovery = ?",[hash,req.body.recovery],function(err,cdd)
+            {
+                if(err){
+                    console.log("Error Selecting : %s ",err );
+                    res.send({error: true, str: "Hubo un error al hacer la búsqueda"});
+                    return;
+                }
+                res.send({error: false})
+            });
+        })
         //console.log(query.sql);
     });
 };

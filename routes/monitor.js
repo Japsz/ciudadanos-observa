@@ -59,41 +59,45 @@ exports.save_cdd = function(req,res){
                         }
                     });
                 } else {
-                    // Si no está registrado el correo, crear usuario
-                    connection.query("INSERT INTO user SET ? ",data, function(err, rows)
-                    {
+                    var bcrypt = require('bcryptjs')
+                    bcrypt.hash(data.password, 10, function(err, hash){
+                        data.password = hash
+                        // Si no está registrado el correo, crear usuario
+                        connection.query("INSERT INTO user SET ? ",data, function(err, rows)
+                        {
 
-                        if (err){
-                            console.log("Error inserting user: %s ",err );
-                            res.send({err:true,errmsg: "Error al ingresar usuario"});
+                            if (err){
+                                console.log("Error inserting user: %s ",err );
+                                res.send({err:true,errmsg: "Error al ingresar usuario"});
 
-                        } else {
-                            var idusuario = rows.insertId;
-                            // Vincular usuario creado al observatorio
-                            connection.query("INSERT INTO ciudadano SET ?",{idobs : input.idobs, iduser : rows.insertId}, function(err, rows)
-                            {
-                                if (err){
-                                    console.log("Error Inserting cdd nuevo: %s ", err);
-                                    res.send({err:true,errmsg:"El Correo ya está registrado en otro observatorio"});
-                                } else {
-                                    // Enviar correo de Usuario nuevo.
-                                    res.mailer.send('mail', {
-                                        to: input.correo, // REQUIRED. This can be a comma delimited string just like a normal email to field.
-                                        subject: 'Estás Inscrito en ObservaCiudadanía!', // REQUIRED.
-                                        password: pass,
-                                        usrname: input.correo.split("@")[0]// All additional properties are also passed to the template as local variables.
-                                    }, function (err) {
-                                        if (err) {
-                                            // handle error
-                                            console.log(err);
-                                            res.send({err:true,errmsg: 'Hubo un error al enviar el correo'});
-                                        } else
-                                            res.send({err:false,insertId: idusuario});
-                                    });
-                                }
-                            });
-                        }
-                    });
+                            } else {
+                                var idusuario = rows.insertId;
+                                // Vincular usuario creado al observatorio
+                                connection.query("INSERT INTO ciudadano SET ?",{idobs : input.idobs, iduser : rows.insertId}, function(err, rows)
+                                {
+                                    if (err){
+                                        console.log("Error Inserting cdd nuevo: %s ", err);
+                                        res.send({err:true,errmsg:"El Correo ya está registrado en otro observatorio"});
+                                    } else {
+                                        // Enviar correo de Usuario nuevo.
+                                        res.mailer.send('mail', {
+                                            to: input.correo, // REQUIRED. This can be a comma delimited string just like a normal email to field.
+                                            subject: 'Estás Inscrito en ObservaCiudadanía!', // REQUIRED.
+                                            password: pass,
+                                            usrname: input.correo.split("@")[0]// All additional properties are also passed to the template as local variables.
+                                        }, function (err) {
+                                            if (err) {
+                                                // handle error
+                                                console.log(err);
+                                                res.send({err:true,errmsg: 'Hubo un error al enviar el correo'});
+                                            } else
+                                                res.send({err:false,insertId: idusuario});
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    })
                 }
             });
 

@@ -51,7 +51,10 @@ exports.user_login_handler = function(req, res){
           	  } else if(users.length == 1){
                   var bcryptjs = require('bcryptjs')
                   bcryptjs.compare(password, users[0].password, function(err, result){
-                      if(result) {
+                      if (err) {
+                          console.log(err)
+                          res.redirect('/bad_login')
+                      } else if(result) {
                           req.session.user = users[0];
                           var nom = users[0].nombre;
                           switch(users[0].tipo){
@@ -85,6 +88,9 @@ exports.user_login_handler = function(req, res){
                           res.redirect('/bad_login');
                       }
                   })
+              } else {
+          	      console.log(users)
+                  res.redirect('/bad_login');
               }
           });
            

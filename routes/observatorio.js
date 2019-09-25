@@ -41,8 +41,8 @@ exports.admin_obs = function(req, res){
                     " WHERE ciudadano.idobs = ? GROUP BY user.iduser",req.params.idobs,function(err,users){
                     if(err)
                         console.log("Error Selecting : %s ",err );
-                    connection.query("SELECT proyecto.*,user.username,evento.nombre, COUNT(userproyecto.iduser) AS ints FROM proyecto LEFT JOIN user ON user.iduser = proyecto.idcreador" +
-                        " LEFT JOIN evento ON proyecto.idevento = evento.idevento LEFT JOIN userproyecto ON userproyecto.idproyecto = proyecto.idproyecto WHERE proyecto.idobservatorio = ? GROUP BY proyecto.idproyecto",req.params.idobs,function(err,proyects){
+                    connection.query("SELECT proyecto.*,user.username,event.nombre, COUNT(userproyecto.iduser) AS ints FROM proyecto LEFT JOIN user ON user.iduser = proyecto.idcreador" +
+                        " LEFT JOIN event ON proyecto.idevento = event.idevento LEFT JOIN userproyecto ON userproyecto.idproyecto = proyecto.idproyecto WHERE proyecto.idobservatorio = ? GROUP BY proyecto.idproyecto",req.params.idobs,function(err,proyects){
                         if(err)
                             console.log("Error Selecting : %s ",err );
                         res.render('admin/obs/admin_obs',{page_title:"Observatorios",obs:obs[0], usr:req.session.user,users: users,proyects: proyects});
